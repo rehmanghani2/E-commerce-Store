@@ -1,0 +1,299 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add New Product — ToolNest Store Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#006194;--primary-dark:#004b73;--primary-light:#cce5ff;
+  --surface:#f7f9fb;--surface-white:#ffffff;--surface-alt:#F1F5F9;
+  --on-surface:#191c1e;--on-surface-muted:#64748b;
+  --border:#E2E8F0;--font-sans:'Inter',sans-serif;--font-mono:'JetBrains Mono',monospace;
+  --error:#ba1a1a;
+}
+body{font-family:var(--font-sans);background:var(--surface);color:var(--on-surface);font-size:14px;line-height:1.5;display:flex;min-height:100vh}
+a{color:inherit;text-decoration:none}
+button{font-family:var(--font-sans);cursor:pointer;border:none;background:none}
+
+/* SIDEBAR */
+.sidebar{width:240px;background:var(--surface-white);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;bottom:0;left:0;z-index:10}
+.brand-area{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.brand-icon{width:36px;height:36px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+.brand-name{font-size:.95rem;font-weight:700;color:var(--primary)}
+.brand-sub{font-size:.7rem;color:var(--on-surface-muted);font-weight:500}
+
+.sidebar-top-btn{padding:16px 12px;border-bottom:1px solid var(--border)}
+.btn-sidebar-add{width:100%;background:var(--primary);color:#fff;font-weight:600;padding:10px;border-radius:.375rem;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s}
+.btn-sidebar-add:hover{background:var(--primary-dark)}
+
+.nav-list{padding:16px 12px;display:flex;flex-direction:column;gap:4px;flex:1}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:.375rem;font-weight:500;color:var(--on-surface-muted);transition:all .15s}
+.nav-item:hover{background:var(--surface-alt);color:var(--on-surface)}
+.nav-item.active{background:var(--primary-light);color:var(--primary);font-weight:600}
+.nav-item svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.75}
+
+.sidebar-bottom{padding:16px 12px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
+
+/* MAIN WRAPPER */
+.main-wrapper{margin-left:240px;flex:1;display:flex;flex-direction:column;min-width:0}
+
+/* TOP HEADER */
+.top-header{height:64px;background:var(--surface-white);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:9}
+.search-bar{position:relative;width:360px}
+.search-input{width:100%;background:var(--surface-white);border:1px solid var(--border);border-radius:.25rem;padding:7px 12px 7px 34px;font-size:.85rem;outline:none}
+.search-input:focus{border-color:var(--primary)}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:var(--on-surface-muted);fill:none;stroke-width:2}
+
+.header-right{display:flex;align-items:center;gap:20px}
+.portal-label{font-size:.9rem;font-weight:600;color:var(--on-surface)}
+.header-icon{color:var(--on-surface-muted);position:relative;display:flex;align-items:center}
+.header-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.75}
+.avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;border:1px solid var(--border)}
+
+/* CONTENT BODY */
+.content{padding:32px;max-width:1100px}
+.page-title-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px}
+.page-title{font-size:1.6rem;font-weight:700;letter-spacing:-.02em}
+.page-sub{font-size:.875rem;color:var(--on-surface-muted);margin-top:2px}
+
+.actions-group{display:flex;gap:12px}
+.btn-cancel{background:var(--surface-white);border:1px solid var(--border);border-radius:.375rem;padding:10px 20px;font-size:.9rem;font-weight:500;color:var(--on-surface)}
+.btn-save{background:var(--primary);color:#fff;border-radius:.375rem;padding:10px 24px;font-size:.9rem;font-weight:600;transition:background .15s}
+.btn-save:hover{background:var(--primary-dark)}
+
+/* FORM LAYOUT */
+.form-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:24px}
+.card{background:var(--surface-white);border:1px solid var(--border);border-radius:.5rem;padding:24px;margin-bottom:24px}
+.card-title{font-size:.95rem;font-weight:600;color:var(--on-surface);margin-bottom:16px}
+
+.form-group{margin-bottom:16px}
+.form-group:last-child{margin-bottom:0}
+.form-label{display:block;font-family:var(--font-mono);font-size:.7rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--on-surface-muted);margin-bottom:6px}
+.form-control{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:.25rem;padding:10px 12px;font-size:.9rem;font-family:var(--font-sans);outline:none}
+.form-control:focus{border-color:var(--primary);background:#fff}
+
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* MEDIA DROPZONE */
+.dropzone{border:2px dashed var(--border);border-radius:.375rem;padding:32px 16px;text-align:center;background:var(--surface);cursor:pointer;transition:border-color .15s}
+.dropzone:hover{border-color:var(--primary)}
+.dropzone-icon{width:40px;height:40px;border-radius:50%;background:#e0f2fe;color:#0284c7;display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+.dropzone-icon svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2}
+.dropzone-text{font-weight:600;font-size:.9rem;margin-bottom:4px}
+.dropzone-sub{font-family:var(--font-mono);font-size:.7rem;color:var(--on-surface-muted)}
+
+.tag-box{display:flex;flex-wrap:wrap;gap:6px;padding:6px;background:var(--surface);border:1px solid var(--border);border-radius:.25rem}
+.tag-chip{font-family:var(--font-mono);font-size:.75rem;background:var(--surface-white);border:1px solid var(--border);padding:2px 8px;border-radius:.25rem;display:inline-flex;align-items:center;gap:4px}
+.tag-input{border:none;background:transparent;outline:none;font-size:.85rem;font-family:var(--font-mono);flex:1;min-width:80px}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="brand-area">
+    <div class="brand-icon">TN</div>
+    <div>
+      <div class="brand-name">ToolNest Store</div>
+      <div class="brand-sub">Admin Dashboard</div>
+    </div>
+  </div>
+
+  <div class="sidebar-top-btn">
+    <a href="/admin-dashboard/products/add/" class="btn-sidebar-add">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add New Product
+    </a>
+  </div>
+
+  <nav class="nav-list">
+    <a href="/admin-dashboard/" class="nav-item">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a href="/admin-dashboard/products/" class="nav-item active">
+      <svg viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+      Products
+    </a>
+    <a href="/orders/" class="nav-item">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+      Orders
+    </a>
+    <a href="#" class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      Customers
+    </a>
+    <a href="#" class="nav-item">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Settings
+    </a>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <a href="#" class="nav-item" style="font-size:.85rem"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Help Center</a>
+    <a href="/account/login/" class="nav-item" style="font-size:.85rem;color:var(--error)"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Logout</a>
+  </div>
+</aside>
+
+<!-- MAIN WRAPPER -->
+<div class="main-wrapper">
+  
+  <!-- TOP HEADER -->
+  <header class="top-header">
+    <div style="display:flex;align-items:center;gap:16px">
+      <span class="portal-label">Admin Portal</span>
+      <div class="search-bar">
+        <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="search-input" type="text" placeholder="Search products, SKUs...">
+      </div>
+    </div>
+    <div class="header-right">
+      <a href="#" class="header-icon" title="Notifications">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      </a>
+      <a href="#" class="header-icon" title="Messages">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      </a>
+      <a href="#" class="header-icon" title="Settings">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      </a>
+      <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" class="avatar" alt="Admin Avatar">
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="content">
+    <form id="addProductForm" onsubmit="saveProduct(event)">
+      
+      <div class="page-title-row">
+        <div>
+          <h1 class="page-title">Add New Product</h1>
+          <p class="page-sub">Enter product details, specifications, and upload imagery.</p>
+        </div>
+        <div class="actions-group">
+          <a href="/admin-dashboard/products/" class="btn-cancel">Cancel</a>
+          <button type="submit" class="btn-save" id="saveBtn">Save Product</button>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        
+        <!-- LEFT COLUMN -->
+        <div>
+          <div class="card">
+            <div class="card-title">Basic Information</div>
+            <div class="form-group">
+              <label class="form-label">PRODUCT NAME</label>
+              <input class="form-control" type="text" id="title" placeholder="e.g., Quantum Keyboard Pro" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">DESCRIPTION</label>
+              <textarea class="form-control" id="description" rows="5" placeholder="Detailed product description..." required></textarea>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Pricing & Inventory</div>
+            <div class="form-row-2 form-group">
+              <div>
+                <label class="form-label">PRICE (USD)</label>
+                <input class="form-control" type="number" step="0.01" id="price" placeholder="$ 0.00" required>
+              </div>
+              <div>
+                <label class="form-label">SKU</label>
+                <input class="form-control" type="text" id="sku" placeholder="PRD-001">
+              </div>
+            </div>
+            <div class="form-group" style="width:50%">
+              <label class="form-label">STOCK QUANTITY</label>
+              <input class="form-control" type="number" id="stock" value="0" required>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div>
+          <div class="card">
+            <div class="card-title">Media</div>
+            <div class="dropzone" onclick="document.getElementById('imageUrl').focus()">
+              <div class="dropzone-icon">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              </div>
+              <div class="dropzone-text">Click to upload or drag and drop</div>
+              <div class="dropzone-sub">SVG, PNG, JPG (max 5MB)</div>
+            </div>
+            <div class="form-group" style="margin-top:16px">
+              <label class="form-label">OR IMAGE URL</label>
+              <input class="form-control" type="url" id="imageUrl" placeholder="https://images.unsplash.com/...">
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Organization</div>
+            <div class="form-group">
+              <label class="form-label">CATEGORY</label>
+              <select class="form-control" id="category" required>
+                <option value="">Select category</option>
+                {% for c in categories %}
+                <option value="{{ c.id }}">{{ c.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">TAGS</label>
+              <div class="tag-box">
+                <span class="tag-chip">New Arrival <span style="cursor:pointer">&times;</span></span>
+                <input type="text" class="tag-input" id="badge" placeholder="Add badge tag...">
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </form>
+  </main>
+</div>
+
+<script>
+function getCookie(n){let v=null;document.cookie.split(';').forEach(c=>{c=c.trim();if(c.startsWith(n+'='))v=decodeURIComponent(c.slice(n.length+1))});return v}
+
+async function saveProduct(e){
+  e.preventDefault();
+  const btn=document.getElementById('saveBtn');
+  btn.disabled=true;btn.textContent='Saving…';
+
+  const title=document.getElementById('title').value.trim();
+  const description=document.getElementById('description').value.trim();
+  const price=document.getElementById('price').value;
+  const stock=document.getElementById('stock').value;
+  const category_id=document.getElementById('category').value;
+  const image_url=document.getElementById('imageUrl').value.trim();
+  const badge=document.getElementById('badge').value.trim()||'NEW';
+
+  try{
+    const res=await fetch('/api/admin/products/add/',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')},
+      body:JSON.stringify({title,description,price,stock,category_id,image_url,badge})
+    });
+    const data=await res.json();
+    if(data.success){
+      window.location.href='/admin-dashboard/products/';
+    }else{
+      alert('Error saving product: '+(data.error||'Unknown error'));
+      btn.disabled=false;btn.textContent='Save Product';
+    }
+  }catch(err){
+    alert('Network error while saving product.');
+    btn.disabled=false;btn.textContent='Save Product';
+  }
+}
+</script>
+</body>
+</html>

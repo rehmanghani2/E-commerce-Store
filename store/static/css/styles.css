@@ -1,0 +1,78 @@
+/* ─── CodeAlpha Design System Tokens ────────────────────────────────────────── */
+:root {
+  /* Colors */
+  --surface: #f7f9fb;
+  --surface-dim: #d8dadc;
+  --surface-bright: #f7f9fb;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f2f4f6;
+  --surface-container: #eceef0;
+  --surface-container-high: #e6e8ea;
+  --surface-container-highest: #e0e3e5;
+
+  --on-surface: #191c1e;
+  --on-surface-variant: #3f4850;
+  --inverse-surface: #2d3133;
+  --inverse-on-surface: #eff1f3;
+
+  --outline: #707881;
+  --outline-variant: #bfc7d2;
+
+  --primary: #006194;
+  --on-primary: #ffffff;
+  --primary-container: #007bb9;
+  --on-primary-container: #fdfcff;
+  --inverse-primary: #93ccff;
+  --primary-dark: #004b73;
+  --primary-light: #cce5ff;
+
+  --secondary: #565e74;
+  --on-secondary: #ffffff;
+  --secondary-container: #dae2fd;
+
+  --tertiary: #831ada;
+  --accent-purple: #9333EA;
+
+  --error: #ba1a1a;
+  --error-container: #ffdad6;
+  --success: #15803d;
+
+  --surface-dark: #0F172A;
+  --background-alt: #F1F5F9;
+  --border-subtle: #E2E8F0;
+  --border: #E2E8F0;
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Elevational Depth */
+  --shadow-level-1: 0 1px 3px rgba(15, 23, 42, 0.05);
+  --shadow-level-2: 0 4px 20px rgba(15, 23, 42, 0.05);
+
+  /* Radius */
+  --radius-sm: 0.125rem;
+  --radius-default: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-full: 9999px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--surface);
+  color: var(--on-surface);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.mono-text {
+  font-family: var(--font-mono);
+}

@@ -1,0 +1,176 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NovaStore - Next-Generation E-Commerce Store offering premium electronics, audio gear, wearables, and gaming accessories.">
+  <title>{% block title %}NovaStore - Premium E-Commerce{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="navbar glass-panel">
+    <a href="{% url 'index' %}" class="nav-brand">
+      <div class="logo-icon">⚡</div>
+      <span class="brand-font gradient-text">NovaStore</span>
+    </a>
+
+    <form action="{% url 'index' %}" method="GET" class="nav-search">
+      <span class="search-icon">🔍</span>
+      <input type="text" name="search" placeholder="Search headphones, smartwatches, gear..." value="{{ search_query|default:'' }}" />
+    </form>
+
+    <div class="nav-actions">
+      <button class="cart-trigger" onclick="toggleCartDrawer(true)">
+        <span>🛒 Cart</span>
+        <span class="cart-badge" style="display: none;">0</span>
+      </button>
+
+      <div id="userAreaNav">
+        <button class="user-btn" onclick="openModal('authModal')">
+          👤 Sign In / Register
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- CART OVERLAY & DRAWER -->
+  <div class="cart-overlay" id="cartOverlay" onclick="if(event.target === this) toggleCartDrawer(false)">
+    <div class="cart-drawer">
+      <div class="cart-header">
+        <h3 class="cart-title">Your Shopping Cart</h3>
+        <button class="close-btn" onclick="toggleCartDrawer(false)">✕</button>
+      </div>
+      <div class="cart-body" id="cartDrawerBody">
+        <!-- Dynamic Cart Items via JS -->
+      </div>
+      <div class="cart-footer">
+        <div class="subtotal-row">
+          <span>Subtotal</span>
+          <span id="cartSubtotal" class="gradient-text">$0.00</span>
+        </div>
+        <a href="{% url 'checkout' %}" class="gradient-btn" style="width: 100%; text-align: center;">Proceed to Checkout ➔</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTH MODAL (LOGIN / REGISTER) -->
+  <div class="modal-overlay" id="authModal" onclick="if(event.target === this) closeModal('authModal')">
+    <div class="modal-box" style="max-width: 440px;">
+      <button class="close-btn modal-close" onclick="closeModal('authModal')">✕</button>
+      <div style="padding: 2rem;">
+        <div style="display: flex; gap: 1rem; border-bottom: 1px solid var(--border-glass); margin-bottom: 1.5rem; padding-bottom: 0.5rem;">
+          <button id="loginTabBtn" style="background: none; color: #fff; font-size: 1.1rem; font-weight: 700; border-bottom: 2px solid var(--primary); padding-bottom: 0.4rem;" onclick="switchAuthTab('login')">Sign In</button>
+          <button id="regTabBtn" style="background: none; color: var(--text-muted); font-size: 1.1rem; font-weight: 700; padding-bottom: 0.4rem;" onclick="switchAuthTab('register')">Register</button>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <form id="loginForm" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label>Username</label>
+            <input type="text" name="username" class="form-control" placeholder="Enter your username" required>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="gradient-btn" style="width: 100%; margin-top: 1rem;">Sign In</button>
+        </form>
+
+        <!-- REGISTER FORM -->
+        <form id="registerForm" onsubmit="handleRegister(event)" style="display: none;">
+          <div class="form-group">
+            <label>Username</label>
+            <input type="text" name="reg_username" class="form-control" placeholder="Choose a username" required>
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" name="reg_email" class="form-control" placeholder="name@example.com" required>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" name="reg_password" class="form-control" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="gradient-btn" style="width: 100%; margin-top: 1rem;">Create Account</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUICK VIEW MODAL CONTAINER -->
+  <div class="modal-overlay" id="quickViewModal" onclick="if(event.target === this) closeModal('quickViewModal')">
+    <div class="modal-box">
+      <button class="close-btn modal-close" onclick="closeModal('quickViewModal')">✕</button>
+      <div id="quickViewBody"></div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT BLOCK -->
+  <main>
+    {% block content %}
+    {% endblock %}
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 2rem; text-align: left; margin-bottom: 2rem;">
+      <div>
+        <div class="nav-brand" style="margin-bottom: 0.75rem;">
+          <div class="logo-icon">⚡</div>
+          <span class="brand-font gradient-text">NovaStore</span>
+        </div>
+        <p style="max-width: 300px; color: var(--text-muted); font-size: 0.85rem;">
+          Elevating everyday life with state-of-the-art tech accessories, audio gear, and wearables.
+        </p>
+      </div>
+      <div>
+        <h4 style="color: #fff; margin-bottom: 0.75rem;">Categories</h4>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.85rem;">
+          <li><a href="/?category=audio-sound">Audio & Sound</a></li>
+          <li><a href="/?category=wearables">Wearables</a></li>
+          <li><a href="/?category=gaming-pc">Gaming & PC</a></li>
+          <li><a href="/?category=accessories">Accessories & Gear</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 style="color: #fff; margin-bottom: 0.75rem;">Customer Care</h4>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.85rem;">
+          <li><a href="/orders/">Order Tracking</a></li>
+          <li><a href="#">Shipping Policy</a></li>
+          <li><a href="#">Returns & Warranty</a></li>
+        </ul>
+      </div>
+    </div>
+    <p>© 2026 NovaStore Inc. All rights reserved. Built with Django & Vanilla CSS.</p>
+  </footer>
+
+  <script src="{% static 'js/app.js' %}"></script>
+  <script>
+    function switchAuthTab(tab) {
+      const loginForm = document.getElementById('loginForm');
+      const regForm = document.getElementById('registerForm');
+      const loginTabBtn = document.getElementById('loginTabBtn');
+      const regTabBtn = document.getElementById('regTabBtn');
+
+      if (tab === 'login') {
+        loginForm.style.display = 'block';
+        regForm.style.display = 'none';
+        loginTabBtn.style.color = '#fff';
+        loginTabBtn.style.borderBottom = '2px solid var(--primary)';
+        regTabBtn.style.color = 'var(--text-muted)';
+        regTabBtn.style.borderBottom = 'none';
+      } else {
+        loginForm.style.display = 'none';
+        regForm.style.display = 'block';
+        regTabBtn.style.color = '#fff';
+        regTabBtn.style.borderBottom = '2px solid var(--primary)';
+        loginTabBtn.style.color = 'var(--text-muted)';
+        loginTabBtn.style.borderBottom = 'none';
+      }
+    }
+  </script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

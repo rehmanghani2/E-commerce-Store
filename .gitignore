@@ -1,0 +1,41 @@
+# Python & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+.eggs/
+
+# Environments & Dependencies
+.env
+.env.local
+.env.*.local
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# Django local files
+db.sqlite3
+db.sqlite3-journal
+staticfiles/
+media/
+*.log
+
+# IDE & Editor Settings
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini

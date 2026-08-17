@@ -1,0 +1,181 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In — ToolNest Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#006194;--primary-dark:#004b73;--primary-light:#cce5ff;
+  --surface:#f7f9fb;--white:#ffffff;--surface-alt:#F1F5F9;
+  --on-surface:#191c1e;--on-surface-muted:#3f4850;
+  --border:#E2E8F0;--border-focus:#006194;
+  --error:#ba1a1a;--error-bg:#ffdad6;
+  --font-sans:'Inter',sans-serif;--font-mono:'JetBrains Mono',monospace;
+}
+body{font-family:var(--font-sans);background:var(--surface);color:var(--on-surface);min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+button{font-family:var(--font-sans);cursor:pointer;border:none;background:none}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:rgba(247,249,251,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 48px;height:60px;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{font-size:1.25rem;font-weight:700;color:var(--primary)}
+.nav-link{font-size:.875rem;color:var(--on-surface-muted);font-weight:500}
+.nav-link span{color:var(--primary);font-weight:600}
+
+/* MAIN */
+main{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 24px}
+.auth-card{background:var(--white);border:1px solid var(--border);border-radius:.5rem;padding:40px;width:100%;max-width:420px;box-shadow:0 4px 20px rgba(15,23,42,.06)}
+.auth-header{margin-bottom:28px}
+.auth-title{font-size:1.5rem;font-weight:700;letter-spacing:-.02em;margin-bottom:6px}
+.auth-sub{font-size:.9rem;color:var(--on-surface-muted)}
+
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:.85rem;font-weight:500;color:var(--on-surface);margin-bottom:6px}
+.form-control{width:100%;background:var(--white);border:1px solid var(--border);border-radius:.25rem;padding:10px 12px;font-size:.9rem;font-family:var(--font-sans);color:var(--on-surface);outline:none;transition:border-color .15s,box-shadow .15s}
+.form-control:focus{border-color:var(--border-focus);box-shadow:0 0 0 2px rgba(0,97,148,.15)}
+.form-control.error{border-color:var(--error)}
+
+.btn-primary{width:100%;padding:12px;background:var(--primary);color:#fff;font-size:.95rem;font-weight:600;border-radius:.25rem;transition:background .2s;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed}
+
+.error-alert{background:var(--error-bg);border:1px solid rgba(186,26,26,.2);border-radius:.25rem;padding:10px 14px;font-size:.85rem;color:var(--error);margin-bottom:16px;display:none}
+.error-alert.show{display:flex;align-items:center;gap:8px}
+
+.divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--on-surface-muted);font-size:.8rem}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.auth-footer{text-align:center;font-size:.875rem;color:var(--on-surface-muted);margin-top:20px}
+.auth-footer a{color:var(--primary);font-weight:600}
+
+.input-wrapper{position:relative}
+.input-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--on-surface-muted);font-size:.8rem;font-family:var(--font-mono);cursor:pointer;user-select:none}
+.input-toggle:hover{color:var(--primary)}
+
+/* FOOTER */
+.footer{border-top:1px solid var(--border);padding:24px 48px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.footer-brand{font-size:1rem;font-weight:700;color:var(--primary)}
+.footer-copy{font-size:.8rem;color:var(--on-surface-muted)}
+.footer-links{display:flex;gap:20px}
+.footer-link{font-size:.8rem;color:var(--on-surface-muted);text-decoration:underline;text-underline-offset:2px}
+
+@media(max-width:600px){
+  .nav,.footer{padding-left:16px;padding-right:16px}
+  .auth-card{padding:28px 20px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-brand">ToolNest Store</a>
+  <a href="/account/register/" class="nav-link">New here? <span>Create an account</span></a>
+</nav>
+
+<main>
+  <div class="auth-card">
+    <div class="auth-header">
+      <h1 class="auth-title">Welcome back</h1>
+      <p class="auth-sub">Sign in to your ToolNest Store account to continue.</p>
+    </div>
+
+    <div class="error-alert" id="errorAlert">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span id="errorMsg">Invalid username or password.</span>
+    </div>
+
+    <form id="loginForm" onsubmit="handleLogin(event)" novalidate>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input class="form-control" type="text" id="username" name="username" placeholder="your_username" autocomplete="username" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-wrapper">
+          <input class="form-control" type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password" required style="padding-right:56px">
+          <span class="input-toggle" onclick="togglePwd()" id="pwdToggle">SHOW</span>
+        </div>
+      </div>
+      <button type="submit" class="btn-primary" id="submitBtn">Sign In</button>
+    </form>
+
+    <div class="divider">or</div>
+
+    <div style="background:var(--surface-alt);border:1px solid var(--border);border-radius:.375rem;padding:14px 16px;font-size:.82rem;color:var(--on-surface-muted);line-height:1.6">
+      <strong style="color:var(--on-surface);font-family:var(--font-mono);font-size:.75rem">DEMO CREDENTIALS</strong><br>
+      Username: <code style="font-family:var(--font-mono);color:var(--primary)">demo</code> &nbsp;|&nbsp; Password: <code style="font-family:var(--font-mono);color:var(--primary)">demo123</code>
+    </div>
+
+    <div class="auth-footer">
+      Don't have an account? <a href="/account/register/">Create one free</a>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div style="display:flex;align-items:center;gap:12px">
+    <span class="footer-brand">ToolNest Store</span>
+    <span class="footer-copy">© 2026 ToolNest Store Engineering</span>
+  </div>
+  <div class="footer-links">
+    <a href="#" class="footer-link">Privacy Policy</a>
+    <a href="#" class="footer-link">Terms of Service</a>
+    <a href="#" class="footer-link">Support</a>
+  </div>
+</footer>
+
+<script>
+function getCookie(n){let v=null;document.cookie.split(';').forEach(c=>{c=c.trim();if(c.startsWith(n+'='))v=decodeURIComponent(c.slice(n.length+1))});return v}
+
+function togglePwd(){
+  const inp=document.getElementById('password');
+  const tog=document.getElementById('pwdToggle');
+  if(inp.type==='password'){inp.type='text';tog.textContent='HIDE'}
+  else{inp.type='password';tog.textContent='SHOW'}
+}
+
+async function handleLogin(e){
+  e.preventDefault();
+  const btn=document.getElementById('submitBtn');
+  const alert=document.getElementById('errorAlert');
+  const username=document.getElementById('username').value.trim();
+  const password=document.getElementById('password').value;
+
+  alert.classList.remove('show');
+  if(!username||!password){
+    document.getElementById('errorMsg').textContent='Please fill in all fields.';
+    alert.classList.add('show');return;
+  }
+
+  btn.disabled=true;btn.textContent='Signing in…';
+
+  try{
+    const res=await fetch('/api/auth/login/',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')},
+      body:JSON.stringify({username,password})
+    });
+    const data=await res.json();
+    if(data.success){
+      const next=new URLSearchParams(window.location.search).get('next')||'/';
+      window.location.href=next;
+    }else{
+      document.getElementById('errorMsg').textContent=data.error||'Invalid credentials.';
+      alert.classList.add('show');
+      document.getElementById('password').value='';
+      btn.disabled=false;btn.textContent='Sign In';
+    }
+  }catch(err){
+    document.getElementById('errorMsg').textContent='Network error. Please try again.';
+    alert.classList.add('show');
+    btn.disabled=false;btn.textContent='Sign In';
+  }
+}
+</script>
+</body>
+</html>

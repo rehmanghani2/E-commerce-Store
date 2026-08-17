@@ -1,0 +1,150 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Sign In — ToolNest Store Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#006194;--primary-dark:#004b73;--primary-light:#cce5ff;
+  --surface:#f7f9fb;--surface-white:#ffffff;--surface-alt:#F1F5F9;
+  --on-surface:#191c1e;--on-surface-muted:#64748b;
+  --border:#E2E8F0;--font-sans:'Inter',sans-serif;--font-mono:'JetBrains Mono',monospace;
+  --error:#ba1a1a;--error-bg:#ffdad6;
+}
+body{font-family:var(--font-sans);background:var(--surface);color:var(--on-surface);min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:24px}
+a{color:inherit;text-decoration:none}
+button{font-family:var(--font-sans);cursor:pointer;border:none;background:none}
+
+.admin-card{background:var(--surface-white);border:1px solid var(--border);border-radius:.5rem;padding:40px;width:100%;max-width:440px;box-shadow:0 8px 30px rgba(15,23,42,.08)}
+.brand-header{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.brand-icon{width:40px;height:40px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem}
+.brand-name{font-size:1.1rem;font-weight:700;color:var(--primary)}
+.brand-badge{font-family:var(--font-mono);font-size:.65rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:#e0f2fe;color:#0284c7;padding:2px 8px;border-radius:.25rem;display:inline-block;margin-top:2px}
+
+.auth-title{font-size:1.5rem;font-weight:700;letter-spacing:-.02em;margin-bottom:6px}
+.auth-sub{font-size:.875rem;color:var(--on-surface-muted);margin-bottom:24px}
+
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-family:var(--font-mono);font-size:.7rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--on-surface-muted);margin-bottom:6px}
+.form-control{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:.25rem;padding:10px 12px;font-size:.9rem;font-family:var(--font-sans);color:var(--on-surface);outline:none;transition:all .15s}
+.form-control:focus{border-color:var(--primary);background:#fff;box-shadow:0 0 0 2px rgba(0,97,148,.12)}
+
+.input-wrapper{position:relative}
+.input-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--on-surface-muted);font-size:.75rem;font-family:var(--font-mono);cursor:pointer;user-select:none}
+.input-toggle:hover{color:var(--primary)}
+
+.btn-admin{width:100%;padding:12px;background:var(--primary);color:#fff;font-size:.95rem;font-weight:600;border-radius:.25rem;transition:background .15s;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-admin:hover{background:var(--primary-dark)}
+.btn-admin:disabled{opacity:.65;cursor:not-allowed}
+
+.error-alert{background:var(--error-bg);border:1px solid rgba(186,26,26,.2);border-radius:.25rem;padding:10px 14px;font-size:.85rem;color:var(--error);margin-bottom:18px;display:none;align-items:center;gap:8px}
+.error-alert.show{display:flex}
+
+.security-note{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--on-surface-muted);margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+
+.demo-box{background:var(--surface-alt);border:1px solid var(--border);border-radius:.375rem;padding:12px 14px;font-size:.82rem;color:var(--on-surface-muted);margin-top:20px;line-height:1.5}
+.demo-box strong{color:var(--on-surface);font-family:var(--font-mono);font-size:.72rem}
+
+.back-store{margin-top:24px;text-align:center;font-size:.85rem;color:var(--on-surface-muted)}
+.back-store a{color:var(--primary);font-weight:600}
+</style>
+</head>
+<body>
+
+<div class="admin-card">
+  <div class="brand-header">
+    <div class="brand-icon">TN</div>
+    <div>
+      <div class="brand-name">ToolNest Store</div>
+      <span class="brand-badge">ADMIN PORTAL</span>
+    </div>
+  </div>
+
+  <h1 class="auth-title">Administrator Sign In</h1>
+  <p class="auth-sub">Access the store management console, product inventory, and customer orders.</p>
+
+  <div class="error-alert" id="errorAlert">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span id="errorMsg">Administrator credentials required.</span>
+  </div>
+
+  <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
+    <div class="form-group">
+      <label for="username">ADMIN USERNAME</label>
+      <input class="form-control" type="text" id="username" placeholder="admin" autocomplete="username" required>
+    </div>
+
+    <div class="form-group">
+      <label for="password">ADMIN PASSWORD</label>
+      <div class="input-wrapper">
+        <input class="form-control" type="password" id="password" placeholder="••••••••" autocomplete="current-password" required style="padding-right:56px">
+        <span class="input-toggle" onclick="togglePwd()" id="pwdToggle">SHOW</span>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-admin" id="submitBtn">Sign In to Admin Portal →</button>
+  </form>
+
+  <div class="demo-box">
+    <strong>DEMO ADMIN CREDENTIALS</strong><br>
+    Username: <code style="font-family:var(--font-mono);color:var(--primary)">admin</code> &nbsp;|&nbsp; Password: <code style="font-family:var(--font-mono);color:var(--primary)">admin123</code>
+  </div>
+
+  <div class="security-note">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+    Authorized admin personnel only. System activity is monitored.
+  </div>
+</div>
+
+<div class="back-store">
+  Looking for customer portal? <a href="/account/login/">Customer Sign In</a>
+</div>
+
+<script>
+function getCookie(n){let v=null;document.cookie.split(';').forEach(c=>{c=c.trim();if(c.startsWith(n+'='))v=decodeURIComponent(c.slice(n.length+1))});return v}
+
+function togglePwd(){
+  const inp=document.getElementById('password');
+  const tog=document.getElementById('pwdToggle');
+  inp.type=inp.type==='password'?'text':'password';
+  tog.textContent=inp.type==='password'?'SHOW':'HIDE';
+}
+
+async function handleAdminLogin(e){
+  e.preventDefault();
+  const btn=document.getElementById('submitBtn');
+  const alert=document.getElementById('errorAlert');
+  const username=document.getElementById('username').value.trim();
+  const password=document.getElementById('password').value;
+
+  alert.classList.remove('show');
+  btn.disabled=true;btn.textContent='Authenticating…';
+
+  try{
+    const res=await fetch('/api/auth/admin-login/',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')},
+      body:JSON.stringify({username,password})
+    });
+    const data=await res.json();
+    if(data.success){
+      window.location.href='/admin-dashboard/';
+    }else{
+      document.getElementById('errorMsg').textContent=data.error||'Invalid administrator credentials.';
+      alert.classList.add('show');
+      btn.disabled=false;btn.textContent='Sign In to Admin Portal →';
+    }
+  }catch(err){
+    document.getElementById('errorMsg').textContent='Network error. Please try again.';
+    alert.classList.add('show');
+    btn.disabled=false;btn.textContent='Sign In to Admin Portal →';
+  }
+}
+</script>
+</body>
+</html>

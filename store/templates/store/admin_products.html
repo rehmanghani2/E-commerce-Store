@@ -1,0 +1,460 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manage Products — ToolNest Store Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#006194;--primary-dark:#004b73;--primary-light:#cce5ff;
+  --surface:#f7f9fb;--surface-white:#ffffff;--surface-alt:#F1F5F9;
+  --on-surface:#191c1e;--on-surface-muted:#64748b;
+  --border:#E2E8F0;--font-sans:'Inter',sans-serif;--font-mono:'JetBrains Mono',monospace;
+  --error:#ba1a1a;
+}
+body{font-family:var(--font-sans);background:var(--surface);color:var(--on-surface);font-size:14px;line-height:1.5;display:flex;min-height:100vh}
+a{color:inherit;text-decoration:none}
+button{font-family:var(--font-sans);cursor:pointer;border:none;background:none}
+
+/* SIDEBAR */
+.sidebar{width:240px;background:var(--surface-white);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;bottom:0;left:0;z-index:10}
+.brand-area{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.brand-icon{width:36px;height:36px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+.brand-name{font-size:.95rem;font-weight:700;color:var(--primary)}
+.brand-sub{font-size:.7rem;color:var(--on-surface-muted);font-weight:500}
+
+.nav-list{padding:16px 12px;display:flex;flex-direction:column;gap:4px;flex:1}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:.375rem;font-weight:500;color:var(--on-surface-muted);transition:all .15s}
+.nav-item:hover{background:var(--surface-alt);color:var(--on-surface)}
+.nav-item.active{background:var(--primary-light);color:var(--primary);font-weight:600}
+.nav-item svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.75}
+
+.sidebar-bottom{padding:16px 12px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
+.btn-add-product{background:var(--primary);color:#fff;font-weight:600;padding:10px;border-radius:.375rem;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s}
+.btn-add-product:hover{background:var(--primary-dark)}
+
+/* MAIN CONTENT */
+.main-wrapper{margin-left:240px;flex:1;display:flex;flex-direction:column;min-width:0}
+
+/* TOP HEADER */
+.top-header{height:64px;background:var(--surface-white);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:9}
+.search-bar{position:relative;width:360px}
+.search-input{width:100%;background:var(--surface-white);border:1px solid var(--border);border-radius:.25rem;padding:7px 12px 7px 34px;font-size:.85rem;outline:none}
+.search-input:focus{border-color:var(--primary)}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:var(--on-surface-muted);fill:none;stroke-width:2}
+
+.header-right{display:flex;align-items:center;gap:20px}
+.portal-label{font-size:.9rem;font-weight:600;color:var(--on-surface)}
+.header-icon{color:var(--on-surface-muted);position:relative;display:flex;align-items:center;cursor:pointer}
+.header-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.75}
+.avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;border:1px solid var(--border)}
+
+/* CONTENT BODY */
+.content{padding:32px;max-width:1200px}
+.page-title-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px}
+.page-title{font-size:1.5rem;font-weight:700;letter-spacing:-.02em}
+.page-sub{font-size:.875rem;color:var(--on-surface-muted);margin-top:2px}
+.btn-primary-header{background:var(--primary);color:#fff;font-weight:600;padding:10px 20px;border-radius:.375rem;display:inline-flex;align-items:center;gap:8px;transition:background .15s}
+.btn-primary-header:hover{background:var(--primary-dark)}
+
+/* BULK BAR */
+.bulk-bar{background:#1e293b;color:#fff;padding:10px 20px;border-radius:.375rem;margin-bottom:16px;display:none;align-items:center;justify-content:space-between;animation:fadeIn .2s ease}
+.bulk-bar.show{display:flex}
+.btn-bulk-delete{background:#dc2626;color:#fff;padding:6px 14px;border-radius:.25rem;font-size:.8rem;font-weight:600}
+
+/* PRODUCTS TABLE CARD */
+.table-card{background:var(--surface-white);border:1px solid var(--border);border-radius:.5rem;overflow:hidden;position:relative}
+.table-toolbar{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:relative}
+.toolbar-actions{display:flex;gap:10px}
+.btn-outline{background:var(--surface-white);border:1px solid var(--border);border-radius:.25rem;padding:6px 14px;font-size:.85rem;font-weight:500;display:inline-flex;align-items:center;gap:6px;color:var(--on-surface);cursor:pointer;position:relative}
+.btn-outline:hover{border-color:var(--primary)}
+.btn-outline svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.showing-count{font-family:var(--font-mono);font-size:.8rem;color:var(--on-surface-muted)}
+
+/* FILTER & SORT DROPDOWNS */
+.popover-menu{position:absolute;top:100%;left:0;margin-top:6px;background:#fff;border:1px solid var(--border);border-radius:.375rem;box-shadow:0 8px 24px rgba(0,0,0,.08);display:none;z-index:50;width:180px;overflow:hidden}
+.popover-menu.show{display:block}
+.popover-item{padding:10px 14px;font-size:.85rem;cursor:pointer;transition:background .15s}
+.popover-item:hover{background:var(--surface-alt);color:var(--primary)}
+
+/* TABLE */
+.products-table{width:100%;border-collapse:collapse;text-align:left}
+.products-table th{background:var(--surface-alt);padding:12px 16px;font-family:var(--font-mono);font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--on-surface-muted);border-bottom:1px solid var(--border)}
+.products-table td{padding:16px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:.9rem}
+.products-table tr{transition:background .15s}
+.products-table tr:hover{background:#f8fafc}
+.products-table tr.hidden-row{display:none}
+
+.chk-col{width:40px;text-align:center}
+.chk-input{width:16px;height:16px;accent-color:var(--primary);cursor:pointer}
+
+.prod-cell{display:flex;align-items:center;gap:12px}
+.prod-img{width:48px;height:48px;border-radius:.25rem;background:var(--surface-alt);border:1px solid var(--border);object-fit:cover;flex-shrink:0}
+.prod-title{font-weight:600;color:var(--on-surface);margin-bottom:2px}
+.prod-spec{font-size:.8rem;color:var(--on-surface-muted)}
+
+.sku-text{font-family:var(--font-mono);font-size:.85rem;color:var(--on-surface)}
+
+.cat-chip{font-family:var(--font-mono);font-size:.75rem;background:var(--surface-alt);border:1px solid var(--border);padding:2px 8px;border-radius:.25rem;color:var(--on-surface)}
+
+.price-text{font-family:var(--font-mono);font-weight:600;font-size:.95rem}
+
+.status-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:.75rem;font-weight:500;padding:4px 10px;border-radius:99px}
+.status-in-stock{background:#e0f2fe;color:#0284c7}
+.status-low-stock{background:#fee2e2;color:#dc2626}
+.status-draft{background:#f1f5f9;color:#64748b}
+
+.action-menu-wrap{position:relative;display:inline-block}
+.action-dots{color:var(--on-surface-muted);padding:6px;border-radius:.25rem;cursor:pointer}
+.action-dots:hover{background:var(--surface-alt);color:var(--on-surface)}
+
+.action-dropdown{position:absolute;right:0;top:100%;margin-top:4px;background:#fff;border:1px solid var(--border);border-radius:.375rem;box-shadow:0 8px 24px rgba(0,0,0,.1);display:none;z-index:60;width:150px;overflow:hidden}
+.action-dropdown.show{display:block}
+.action-item{padding:8px 12px;font-size:.85rem;cursor:pointer;display:flex;align-items:center;gap:8px;color:var(--on-surface)}
+.action-item:hover{background:var(--surface-alt)}
+.action-item.danger{color:var(--error)}
+.action-item.danger:hover{background:#fef2f2}
+
+/* PAGINATION */
+.table-footer{padding:16px 20px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);background:var(--surface-alt)}
+.page-info{font-family:var(--font-mono);font-size:.8rem;color:var(--on-surface-muted)}
+.pagination{display:flex;gap:4px}
+.page-btn{width:32px;height:32px;border-radius:.25rem;border:1px solid var(--border);background:var(--surface-white);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:.8rem;font-weight:500;color:var(--on-surface);cursor:pointer}
+.page-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+.toast-container{position:fixed;bottom:24px;right:24px;z-index:1000;display:flex;flex-direction:column;gap:8px}
+.toast{background:#1e293b;color:#fff;padding:12px 18px;border-radius:.375rem;font-size:.85rem;box-shadow:0 10px 30px rgba(0,0,0,.15);display:flex;align-items:center;gap:10px}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="brand-area">
+    <div class="brand-icon">TN</div>
+    <div>
+      <div class="brand-name">ToolNest Store</div>
+      <div class="brand-sub">Admin Dashboard</div>
+    </div>
+  </div>
+
+  <nav class="nav-list">
+    <a href="/admin-dashboard/" class="nav-item">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a href="/admin-dashboard/products/" class="nav-item active">
+      <svg viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+      Products
+    </a>
+    <a href="/orders/" class="nav-item">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+      Orders
+    </a>
+    <a href="#" class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      Customers
+    </a>
+    <a href="#" class="nav-item">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Settings
+    </a>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <a href="/admin-dashboard/products/add/" class="btn-add-product">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add New Product
+    </a>
+    <a href="#" class="nav-item" style="font-size:.85rem"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Help Center</a>
+    <a href="/account/login/" class="nav-item" style="font-size:.85rem;color:var(--error)"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Logout</a>
+  </div>
+</aside>
+
+<!-- MAIN WRAPPER -->
+<div class="main-wrapper">
+  
+  <!-- TOP HEADER -->
+  <header class="top-header">
+    <div style="display:flex;align-items:center;gap:16px">
+      <span class="portal-label">Admin Portal</span>
+      <div class="search-bar">
+        <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="search-input" type="text" id="tableSearchInput" placeholder="Live search products, SKUs..." oninput="filterTable(this.value)">
+      </div>
+    </div>
+    <div class="header-right">
+      <a href="#" class="header-icon" title="Notifications">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      </a>
+      <a href="#" class="header-icon" title="Messages">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      </a>
+      <a href="#" class="header-icon" title="Settings">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      </a>
+      <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" class="avatar" alt="Admin Avatar">
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="content">
+    <div class="page-title-row">
+      <div>
+        <h1 class="page-title">Manage Products</h1>
+        <p class="page-sub">View, edit, and organize your product catalog.</p>
+      </div>
+      <a href="/admin-dashboard/products/add/" class="btn-primary-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add New Product
+      </a>
+    </div>
+
+    <!-- BULK ACTIONS FLOATING BAR -->
+    <div class="bulk-bar" id="bulkBar">
+      <div>Selected <strong id="selectedCount">0</strong> product(s)</div>
+      <button class="btn-bulk-delete" onclick="deleteSelectedRows()">Delete Selected</button>
+    </div>
+
+    <!-- TABLE CARD -->
+    <div class="table-card">
+      <div class="table-toolbar">
+        <div class="toolbar-actions">
+          <div style="position:relative">
+            <button class="btn-outline" onclick="togglePopover('filterMenu')">
+              <svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+              Filter
+            </button>
+            <div class="popover-menu" id="filterMenu">
+              <div class="popover-item" onclick="filterCategory('all')">All Categories</div>
+              <div class="popover-item" onclick="filterCategory('peripherals')">Peripherals</div>
+              <div class="popover-item" onclick="filterCategory('audio')">Audio</div>
+              <div class="popover-item" onclick="filterCategory('wearables')">Wearables</div>
+            </div>
+          </div>
+
+          <div style="position:relative">
+            <button class="btn-outline" onclick="togglePopover('sortMenu')">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+              Sort
+            </button>
+            <div class="popover-menu" id="sortMenu">
+              <div class="popover-item" onclick="sortTable('price-asc')">Price: Low to High</div>
+              <div class="popover-item" onclick="sortTable('price-desc')">Price: High to Low</div>
+              <div class="popover-item" onclick="sortTable('title')">Name: A to Z</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="showing-count" id="showingCountText">Showing 1-{{ products|length }} of {{ total_count }}</div>
+      </div>
+
+      <table class="products-table" id="productsTable">
+        <thead>
+          <tr>
+            <th class="chk-col"><input type="checkbox" class="chk-input" id="selectAllChk" onchange="toggleSelectAll(this)"></th>
+            <th>PRODUCT</th>
+            <th>SKU</th>
+            <th>CATEGORY</th>
+            <th>PRICE</th>
+            <th>STATUS</th>
+            <th style="text-align:right">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          {% for p in products %}
+          <tr id="row-{{ p.id }}" data-id="{{ p.id }}" data-category="{{ p.category.name|lower }}" data-price="{{ p.price }}" data-title="{{ p.title|lower }}">
+            <td class="chk-col"><input type="checkbox" class="chk-input row-chk" onchange="updateBulkBar()"></td>
+            <td>
+              <div class="prod-cell">
+                <img src="{{ p.image_url }}" class="prod-img" alt="{{ p.title }}">
+                <div>
+                  <div class="prod-title">{{ p.title }}</div>
+                  <div class="prod-spec">{{ p.description|truncatewords:6 }}</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="sku-text">SKU-{{ p.id|stringformat:"03d" }}</span></td>
+            <td><span class="cat-chip">{{ p.category.name }}</span></td>
+            <td><span class="price-text">${{ p.price }}</span></td>
+            <td>
+              {% if p.stock > 10 %}
+              <span class="status-badge status-in-stock">● In Stock ({{ p.stock }})</span>
+              {% elif p.stock > 0 %}
+              <span class="status-badge status-low-stock">● Low Stock ({{ p.stock }})</span>
+              {% else %}
+              <span class="status-badge status-draft">● Out of Stock</span>
+              {% endif %}
+            </td>
+            <td style="text-align:right">
+              <div class="action-menu-wrap">
+                <button class="action-dots" onclick="toggleActionDropdown({{ p.id }})" title="Product Actions">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                </button>
+                <div class="action-dropdown" id="dropdown-{{ p.id }}">
+                  <a href="/product/{{ p.slug }}/" target="_blank" class="action-item">View in Store</a>
+                  <div class="action-item danger" onclick="deleteSingleProduct({{ p.id }}, '{{ p.title|escapejs }}')">Delete Product</div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="table-footer">
+        <div class="page-info">Page 1 of 1</div>
+        <div class="pagination">
+          <button class="page-btn">&lt;</button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">&gt;</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+function getCookie(n){let v=null;document.cookie.split(';').forEach(c=>{c=c.trim();if(c.startsWith(n+'='))v=decodeURIComponent(c.slice(n.length+1))});return v}
+
+function togglePopover(id){
+  const el = document.getElementById(id);
+  const isOpen = el.classList.contains('show');
+  document.querySelectorAll('.popover-menu').forEach(m => m.classList.remove('show'));
+  if(!isOpen) el.classList.add('show');
+}
+
+function toggleActionDropdown(id){
+  const el = document.getElementById('dropdown-'+id);
+  const isOpen = el.classList.contains('show');
+  document.querySelectorAll('.action-dropdown').forEach(d => d.classList.remove('show'));
+  if(!isOpen) el.classList.add('show');
+}
+
+// LIVE TABLE FILTERING
+function filterTable(val){
+  val = val.trim().toLowerCase();
+  const rows = document.querySelectorAll('#tableBody tr');
+  let visible = 0;
+  rows.forEach(r => {
+    const text = r.innerText.toLowerCase();
+    if(text.includes(val)){
+      r.classList.remove('hidden-row');
+      visible++;
+    } else {
+      r.classList.add('hidden-row');
+    }
+  });
+  document.getElementById('showingCountText').textContent = `Showing 1-${visible} of ${rows.length}`;
+}
+
+function filterCategory(cat){
+  document.querySelectorAll('.popover-menu').forEach(m => m.classList.remove('show'));
+  const rows = document.querySelectorAll('#tableBody tr');
+  let visible = 0;
+  rows.forEach(r => {
+    const rcat = r.getAttribute('data-category');
+    if(cat === 'all' || rcat.includes(cat)){
+      r.classList.remove('hidden-row');
+      visible++;
+    } else {
+      r.classList.add('hidden-row');
+    }
+  });
+  showToast(`Filtered by ${cat.toUpperCase()}`);
+}
+
+function sortTable(type){
+  document.querySelectorAll('.popover-menu').forEach(m => m.classList.remove('show'));
+  const tbody = document.getElementById('tableBody');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+
+  rows.sort((a,b) => {
+    if(type === 'price-asc') return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
+    if(type === 'price-desc') return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
+    if(type === 'title') return a.dataset.title.localeCompare(b.dataset.title);
+    return 0;
+  });
+
+  rows.forEach(r => tbody.appendChild(r));
+  showToast(`Sorted table by ${type}`);
+}
+
+// BULK CHECKBOX
+function toggleSelectAll(master){
+  document.querySelectorAll('.row-chk').forEach(c => c.checked = master.checked);
+  updateBulkBar();
+}
+
+function updateBulkBar(){
+  const checked = document.querySelectorAll('.row-chk:checked');
+  const bar = document.getElementById('bulkBar');
+  if(checked.length > 0){
+    bar.classList.add('show');
+    document.getElementById('selectedCount').textContent = checked.length;
+  } else {
+    bar.classList.remove('show');
+  }
+}
+
+async function deleteSingleProduct(id, title){
+  if(!confirm(`Are you sure you want to delete "${title}"?`)) return;
+  try{
+    const res = await fetch(`/api/admin/products/${id}/delete/`,{
+      method:'POST',
+      headers:{'X-CSRFToken':getCookie('csrftoken')}
+    });
+    const data = await res.json();
+    if(data.success){
+      const row = document.getElementById('row-'+id);
+      if(row) row.remove();
+      showToast(`Deleted product: ${title}`);
+    }else{
+      alert('Error deleting product.');
+    }
+  }catch(err){
+    alert('Network error while deleting product.');
+  }
+}
+
+async function deleteSelectedRows(){
+  const checked = document.querySelectorAll('.row-chk:checked');
+  if(!confirm(`Delete ${checked.length} selected products?`)) return;
+  for(let chk of checked){
+    const row = chk.closest('tr');
+    const id = row.getAttribute('data-id');
+    try{
+      await fetch(`/api/admin/products/${id}/delete/`,{
+        method:'POST',
+        headers:{'X-CSRFToken':getCookie('csrftoken')}
+      });
+      row.remove();
+    }catch(e){}
+  }
+  updateBulkBar();
+  showToast('Selected products deleted.');
+}
+
+function showToast(msg){
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> ${msg}`;
+  container.appendChild(toast);
+  setTimeout(() => { toast.remove(); }, 3500);
+}
+
+document.addEventListener('click', e => {
+  if(!e.target.closest('.toolbar-actions')) document.querySelectorAll('.popover-menu').forEach(m => m.classList.remove('show'));
+  if(!e.target.closest('.action-menu-wrap')) document.querySelectorAll('.action-dropdown').forEach(d => d.classList.remove('show'));
+});
+</script>
+</body>
+</html>

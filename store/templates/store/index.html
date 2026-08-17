@@ -1,0 +1,455 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ToolNest Store — High-Performance Tech & Peripherals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#006194;--primary-dark:#004b73;--primary-light:#cce5ff;
+  --purple:#9333EA;
+  --surface:#f7f9fb;--surface-white:#ffffff;--surface-alt:#F1F5F9;
+  --on-surface:#191c1e;--on-surface-muted:#3f4850;
+  --border:#E2E8F0;--border-focus:#006194;
+  --error:#ba1a1a;--success:#15803d;
+  --font-sans:'Inter',sans-serif;--font-mono:'JetBrains Mono',monospace;
+  --shadow-card:0 4px 20px rgba(15,23,42,.05);
+  --max-w:1280px;
+}
+body{font-family:var(--font-sans);background:var(--surface);color:var(--on-surface);font-size:16px;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button{font-family:var(--font-sans);cursor:pointer;border:none;background:none}
+img{display:block;max-width:100%}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:rgba(247,249,251,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 48px;height:64px;display:flex;align-items:center;justify-content:space-between}
+.nav-left{display:flex;align-items:center;gap:32px}
+.nav-brand{font-size:1.25rem;font-weight:700;color:var(--primary);letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+.nav-brand span{color:var(--purple)}
+.nav-links{display:flex;align-items:center;gap:24px}
+.nav-link{font-size:.9rem;font-weight:500;color:var(--on-surface-muted);transition:color .15s}
+.nav-link:hover,.nav-link.active{color:var(--primary)}
+.nav-right{display:flex;align-items:center;gap:12px}
+.search-form{position:relative;display:flex;align-items:center}
+.search-input{background:var(--surface-white);border:1px solid var(--border);border-radius:.25rem;padding:7px 12px 7px 32px;font-size:.85rem;font-family:var(--font-sans);width:220px;transition:all .15s;outline:none}
+.search-input:focus{border-color:var(--primary);box-shadow:0 0 0 2px rgba(0,97,148,.12);width:260px}
+.search-icon{position:absolute;left:10px;width:14px;height:14px;stroke:var(--on-surface-muted);fill:none;stroke-width:2}
+.nav-icon{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:.25rem;color:var(--on-surface);transition:background .15s;position:relative}
+.nav-icon:hover{background:var(--border)}
+.nav-icon svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.75}
+.cart-badge{position:absolute;top:6px;right:6px;background:var(--primary);color:#fff;font-size:10px;font-family:var(--font-mono);font-weight:500;width:16px;height:16px;border-radius:99px;display:flex;align-items:center;justify-content:center}
+
+/* HERO */
+.hero{max-width:var(--max-w);margin:32px auto 64px;padding:0 48px}
+.hero-card{background:linear-gradient(135deg, #0F172A 0%, #1E293B 100%);border-radius:.5rem;padding:64px 56px;color:#fff;display:grid;grid-template-columns:1.2fr 1fr;gap:48px;align-items:center;position:relative;overflow:hidden;box-shadow:0 12px 40px rgba(15,23,42,.15)}
+.hero-tag{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:.75rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#38bdf8;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);padding:4px 12px;border-radius:.25rem;margin-bottom:20px}
+.hero-title{font-size:2.75rem;font-weight:700;line-height:1.15;letter-spacing:-.02em;margin-bottom:16px}
+.hero-desc{font-size:1.05rem;color:#94a3b8;line-height:1.6;margin-bottom:32px;max-width:480px}
+.hero-actions{display:flex;gap:16px;align-items:center}
+.btn-hero-primary{background:#0284c7;color:#fff;font-size:.95rem;font-weight:600;padding:12px 28px;border-radius:.25rem;display:inline-flex;align-items:center;gap:8px;transition:all .2s}
+.btn-hero-primary:hover{background:#0369a1;transform:translateY(-1px)}
+.btn-hero-secondary{border:1px solid #475569;color:#e2e8f0;font-size:.95rem;font-weight:500;padding:12px 24px;border-radius:.25rem;transition:all .2s}
+.btn-hero-secondary:hover{border-color:#94a3b8;background:rgba(255,255,255,.05)}
+.hero-img-wrap{position:relative;display:flex;justify-content:center}
+.hero-img-wrap img{max-height:360px;object-fit:contain;filter:drop-shadow(0 20px 30px rgba(0,0,0,.5))}
+
+/* SECTION TITLE */
+.section-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px}
+.section-title{font-size:1.5rem;font-weight:700;letter-spacing:-.02em}
+.section-sub{font-size:.875rem;color:var(--on-surface-muted);margin-top:4px}
+.view-all{font-family:var(--font-mono);font-size:.8rem;font-weight:500;color:var(--primary);display:inline-flex;align-items:center;gap:4px}
+.view-all:hover{text-decoration:underline}
+
+/* MAIN CONTAINER */
+.container{max-width:var(--max-w);margin:0 auto;padding:0 48px 80px}
+
+/* CATEGORY GRID */
+.category-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:64px}
+.cat-card{background:var(--surface-white);border:1px solid var(--border);border-radius:.5rem;overflow:hidden;transition:all .2s;display:block}
+.cat-card:hover{border-color:var(--primary);box-shadow:var(--shadow-card);transform:translateY(-2px)}
+.cat-img{height:140px;background:var(--surface-alt);overflow:hidden;position:relative}
+.cat-img img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
+.cat-card:hover .cat-img img{transform:scale(1.05)}
+.cat-body{padding:16px}
+.cat-name{font-size:1rem;font-weight:600;color:var(--on-surface);margin-bottom:4px}
+.cat-count{font-family:var(--font-mono);font-size:.75rem;color:var(--on-surface-muted)}
+
+/* PRODUCT GRID */
+.product-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-bottom:64px}
+.product-card{background:var(--surface-white);border:1px solid var(--border);border-radius:.5rem;overflow:hidden;transition:all .2s;display:flex;flex-direction:column;position:relative}
+.product-card:hover{border-color:var(--border-focus);box-shadow:var(--shadow-card);transform:translateY(-2px)}
+.card-badge{position:absolute;top:12px;left:12px;z-index:2;font-family:var(--font-mono);font-size:.65rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:.25rem}
+.badge-hot{background:#fee2e2;color:#dc2626}
+.badge-new{background:#e0f2fe;color:#0284c7}
+.badge-featured{background:#f3e8ff;color:#9333ea}
+.badge-bestseller{background:#fef3c7;color:#d97706}
+
+.card-thumb{aspect-ratio:1/1;background:var(--surface-alt);overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center}
+.card-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
+.product-card:hover .card-thumb img{transform:scale(1.04)}
+
+.card-details{padding:18px;display:flex;flex-direction:column;flex:1}
+.card-cat{font-family:var(--font-mono);font-size:.7rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--primary);margin-bottom:6px}
+.card-title{font-size:.95rem;font-weight:600;color:var(--on-surface);margin-bottom:8px;line-height:1.35;flex:1}
+.card-rating{display:flex;align-items:center;gap:4px;font-size:.8rem;color:#f59e0b;margin-bottom:12px}
+.card-rating span{color:var(--on-surface-muted);font-size:.75rem;font-family:var(--font-mono);margin-left:4px}
+.card-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:12px;border-top:1px solid var(--border)}
+.card-price{font-family:var(--font-mono);font-size:1.1rem;font-weight:600;color:var(--on-surface)}
+.card-price-old{font-family:var(--font-mono);font-size:.8rem;color:var(--on-surface-muted);text-decoration:line-through;margin-left:6px;font-weight:400}
+.btn-add-cart{background:var(--surface-alt);border:1px solid var(--border);color:var(--on-surface);width:36px;height:36px;border-radius:.25rem;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.btn-add-cart:hover{background:var(--primary);border-color:var(--primary);color:#fff}
+
+/* FEATURE PERKS BANNER */
+.perks-banner{background:var(--surface-white);border:1px solid var(--border);border-radius:.5rem;padding:40px;display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-bottom:64px}
+.perk-item{display:flex;gap:16px;align-items:flex-start}
+.perk-icon{width:44px;height:44px;border-radius:.25rem;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.perk-icon svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.75}
+.perk-title{font-size:1rem;font-weight:600;margin-bottom:4px}
+.perk-desc{font-size:.85rem;color:var(--on-surface-muted);line-height:1.5}
+
+/* NEWSLETTER */
+.newsletter-card{background:var(--surface-alt);border:1px solid var(--border);border-radius:.5rem;padding:48px;text-align:center;max-width:720px;margin:0 auto 64px}
+.nl-title{font-size:1.5rem;font-weight:700;margin-bottom:8px}
+.nl-desc{font-size:.9rem;color:var(--on-surface-muted);margin-bottom:24px}
+.nl-form{display:flex;gap:8px;max-width:440px;margin:0 auto}
+.nl-input{flex:1;background:var(--surface-white);border:1px solid var(--border);border-radius:.25rem;padding:12px 16px;font-size:.9rem;outline:none}
+.nl-input:focus{border-color:var(--primary)}
+.btn-nl{background:var(--primary);color:#fff;font-size:.9rem;font-weight:600;padding:12px 24px;border-radius:.25rem;transition:background .2s}
+.btn-nl:hover{background:var(--primary-dark)}
+
+/* FOOTER */
+.footer{border-top:1px solid var(--border);background:#fff;padding:48px}
+.footer-inner{max-width:var(--max-w);margin:0 auto;display:grid;grid-template-columns:2fr repeat(3,1fr);gap:48px}
+.footer-brand{font-size:1.25rem;font-weight:700;color:var(--primary);margin-bottom:12px}
+.footer-desc{font-size:.85rem;color:var(--on-surface-muted);line-height:1.6;max-width:320px;margin-bottom:16px}
+.footer-title{font-family:var(--font-mono);font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--on-surface);margin-bottom:16px}
+.footer-menu{display:flex;flex-direction:column;gap:10px}
+.footer-menu a{font-size:.85rem;color:var(--on-surface-muted);transition:color .15s}
+.footer-menu a:hover{color:var(--primary)}
+.footer-bottom{max-width:var(--max-w);margin:40px auto 0;padding-top:24px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.8rem;color:var(--on-surface-muted)}
+
+/* TOAST */
+.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:999;display:flex;flex-direction:column;gap:8px}
+.toast{background:#fff;border:1px solid var(--border);border-left:3px solid var(--primary);border-radius:.375rem;padding:12px 16px;font-size:.875rem;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,.1);animation:slideUp .25s ease}
+@keyframes slideUp{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+@media(max-width:1024px){
+  .hero-card{grid-template-columns:1fr;padding:40px 32px}
+  .hero-img-wrap{display:none}
+  .category-grid,.product-grid{grid-template-columns:repeat(2,1fr)}
+  .perks-banner{grid-template-columns:1fr}
+  .footer-inner{grid-template-columns:1fr 1fr}
+}
+@media(max-width:640px){
+  .nav,.container,.hero,.footer{padding-left:16px;padding-right:16px}
+  .category-grid,.product-grid{grid-template-columns:1fr}
+  .nl-form{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-left">
+    <a href="/" class="nav-brand">ToolNest <span>Store</span></a>
+    <div class="nav-links">
+      <a href="/" class="nav-link active">Home</a>
+      <a href="/shop/" class="nav-link">Catalog</a>
+      <a href="/orders/" class="nav-link" style="display:inline-flex;align-items:center;gap:4px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        My Orders
+      </a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <form class="search-form" action="/shop/" method="GET">
+      <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input class="search-input" type="text" name="search" placeholder="Search hardware specs...">
+    </form>
+    <a href="/cart/" class="nav-icon" title="Cart">
+      <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      <span class="cart-badge" id="cartCount" style="display:none">0</span>
+    </a>
+    
+    <!-- ACCOUNT & ORDERS DROPDOWN -->
+    <div style="position:relative">
+      {% if user.is_authenticated %}
+      <button class="nav-icon-user" id="userMenuBtn" onclick="toggleUserDropdown(event)" title="Account Options" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:.375rem;background:var(--surface-alt);border:1px solid var(--border);color:var(--on-surface);font-size:.85rem;font-weight:600;cursor:pointer;transition:all .15s">
+        <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.75"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Hi, {{ user.first_name|default:user.username|capfirst }}</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      {% else %}
+      <button class="nav-icon" id="userMenuBtn" onclick="toggleUserDropdown(event)" title="Account Options">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </button>
+      {% endif %}
+
+      <div id="userDropdown" style="position:absolute;right:0;top:100%;margin-top:8px;background:#fff;border:1px solid var(--border);border-radius:.375rem;box-shadow:0 8px 24px rgba(0,0,0,.1);display:none;z-index:120;width:210px;overflow:hidden">
+        {% if user.is_authenticated %}
+        <div style="padding:10px 14px;border-bottom:1px solid var(--border);font-size:.78rem;color:var(--on-surface-muted)">
+          Account: <strong style="color:var(--on-surface)">{{ user.username }}</strong>
+        </div>
+        <a href="/orders/" style="padding:10px 14px;font-size:.85rem;display:flex;align-items:center;gap:8px;color:var(--on-surface);border-bottom:1px solid var(--border);background:#f8fafc">
+          📦 <strong>My Orders & Tracking</strong>
+        </a>
+        <a href="/cart/" style="padding:10px 14px;font-size:.85rem;display:flex;align-items:center;gap:8px;color:var(--on-surface);border-bottom:1px solid var(--border)">
+          🛒 View Shopping Cart
+        </a>
+        <a href="#" onclick="handleLogout()" style="padding:10px 14px;font-size:.85rem;display:flex;align-items:center;gap:8px;color:var(--error)">
+          🚪 Sign Out
+        </a>
+        {% else %}
+        <div style="padding:10px 14px;border-bottom:1px solid var(--border);font-size:.78rem;color:var(--on-surface-muted)">
+          Welcome Guest
+        </div>
+        <a href="/account/login/" style="padding:10px 14px;font-size:.85rem;display:flex;align-items:center;gap:8px;color:var(--primary);font-weight:600">
+          🔑 Sign In / Register
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-card">
+    <div>
+      <div class="hero-tag">⚡ ALPHA SERIES HARDWARE</div>
+      <h1 class="hero-title">Engineered for Precision & Performance.</h1>
+      <p class="hero-desc">Discover studio-grade peripherals, wearable intelligence, and high-fidelity audio crafted with relentless attention to detail.</p>
+      <div class="hero-actions">
+        <a href="/shop/" class="btn-hero-primary">Explore Catalog →</a>
+        <a href="/shop/?badge=FEATURED" class="btn-hero-secondary">View Featured</a>
+      </div>
+    </div>
+    <div class="hero-img-wrap">
+      <img src="{% static 'images/cat_audio.png' %}" alt="Alpha Core Headphones">
+    </div>
+  </div>
+</section>
+
+<!-- MAIN CONTENT -->
+<div class="container">
+
+  <!-- CATEGORIES -->
+  <div class="section-header">
+    <div>
+      <h2 class="section-title">Hardware Categories</h2>
+      <p class="section-sub">Browse by engineering specialization</p>
+    </div>
+    <a href="/shop/" class="view-all">ALL CATEGORIES →</a>
+  </div>
+
+  <div class="category-grid">
+    {% for cat in categories %}
+    <a href="/shop/?category={{ cat.slug }}" class="cat-card">
+      <div class="cat-img">
+        <img src="{% if cat.slug == 'audio' %}{% static 'images/cat_audio.png' %}{% elif cat.slug == 'wearables' %}{% static 'images/cat_wearables.png' %}{% elif cat.slug == 'gaming' %}{% static 'images/cat_gaming.png' %}{% else %}{% static 'images/cat_accessories.png' %}{% endif %}" alt="{{ cat.name }}">
+      </div>
+      <div class="cat-body">
+        <div class="cat-name">{{ cat.name }}</div>
+        <div class="cat-count">{{ cat.products.count|default:"8" }} Products Available</div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+
+  <!-- FEATURED PRODUCTS -->
+  <div class="section-header">
+    <div>
+      <h2 class="section-title">Featured Hardware</h2>
+      <p class="section-sub">Flagship devices tested for maximum reliability</p>
+    </div>
+    <a href="/shop/" class="view-all">VIEW FULL CATALOG →</a>
+  </div>
+
+  <div class="product-grid">
+    {% for p in featured_products %}
+    <div class="product-card">
+      {% if p.badge %}
+      <span class="card-badge {% if p.badge == 'HOT' %}badge-hot{% elif p.badge == 'NEW' %}badge-new{% elif p.badge == 'FEATURED' %}badge-featured{% else %}badge-bestseller{% endif %}">
+        {{ p.badge }}
+      </span>
+      {% endif %}
+      <a href="/product/{{ p.slug }}/" class="card-thumb">
+        <img src="{{ p.image_url }}" alt="{{ p.title }}">
+      </a>
+      <div class="card-details">
+        <div class="card-cat">{{ p.category.name }}</div>
+        <a href="/product/{{ p.slug }}/" class="card-title">{{ p.title }}</a>
+        <div class="card-rating">
+          ★★★★★ <span>({{ p.reviews_count }})</span>
+        </div>
+        <div class="card-bottom">
+          <div>
+            <span class="card-price">${{ p.price }}</span>
+            {% if p.old_price %}<span class="card-price-old">${{ p.old_price }}</span>{% endif %}
+          </div>
+          <button class="btn-add-cart" onclick="quickAdd({{ p.id }},'{{ p.title|escapejs }}',{{ p.price }},'{{ p.image_url|escapejs }}')" title="Add to Cart">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- ENGINEERING PERKS -->
+  <div class="perks-banner">
+    <div class="perk-item">
+      <div class="perk-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div>
+        <div class="perk-title">2-Year Comprehensive Warranty</div>
+        <div class="perk-desc">Every hardware unit is backed by our full replacement and repair guarantee.</div>
+      </div>
+    </div>
+    <div class="perk-item">
+      <div class="perk-icon">
+        <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      </div>
+      <div>
+        <div class="perk-title">Free Express Shipping</div>
+        <div class="perk-desc">Complimentary priority dispatch on all domestic orders over $150.</div>
+      </div>
+    </div>
+    <div class="perk-item">
+      <div class="perk-icon">
+        <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+      </div>
+      <div>
+        <div class="perk-title">30-Day Evaluation Period</div>
+        <div class="perk-desc">Test hardware in your setup with zero risk. Full refund if not completely satisfied.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEWSLETTER -->
+  <div class="newsletter-card">
+    <h3 class="nl-title">Stay Ahead of Next-Gen Releases</h3>
+    <p class="nl-desc">Subscribe to ToolNest Store Engineering updates for exclusive product drops and technical benchmarks.</p>
+    <form class="nl-form" onsubmit="event.preventDefault();toast('Subscribed to ToolNest Store updates!')">
+      <input type="email" class="nl-input" placeholder="developer@domain.com" required>
+      <button type="submit" class="btn-nl">Subscribe</button>
+    </form>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">ToolNest Store</div>
+      <p class="footer-desc">Engineering high-performance electronic hardware, audio interfaces, and wearable technology for demanding workflows.</p>
+    </div>
+    <div>
+      <div class="footer-title">Hardware</div>
+      <div class="footer-menu">
+        <a href="/shop/?category=audio">Audio Interfaces</a>
+        <a href="/shop/?category=wearables">Smart Wearables</a>
+        <a href="/shop/?category=gaming">Peripherals</a>
+        <a href="/shop/?category=accessories">Studio Gear</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-title">Support</div>
+      <div class="footer-menu">
+        <a href="/orders/">Track Order</a>
+        <a href="#">Technical Documentation</a>
+        <a href="#">Warranty & Repair</a>
+        <a href="#">Returns & Refunds</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-title">Account</div>
+      <div class="footer-menu">
+        <a href="/account/login/">Sign In</a>
+        <a href="/account/register/">Create Account</a>
+        <a href="/cart/">Shopping Cart</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div>© 2026 ToolNest Store Engineering. All rights reserved.</div>
+    <div style="display:flex;gap:16px">
+      <a href="#" style="color:var(--on-surface-muted)">Privacy Policy</a>
+      <a href="#" style="color:var(--on-surface-muted)">Terms of Service</a>
+      <a href="#" style="color:var(--on-surface-muted)">Security</a>
+    </div>
+  </div>
+</footer>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+let cart=[];
+try{cart=JSON.parse(localStorage.getItem('novastore_cart')||'[]')}catch(e){}
+function updateBadge(){
+  const t=cart.reduce((s,i)=>s+i.quantity,0);
+  const b=document.getElementById('cartCount');
+  if(b){b.textContent=t;b.style.display=t>0?'flex':'none'}
+}
+updateBadge();
+
+function quickAdd(id,title,price,image_url){
+  const ex=cart.find(i=>i.id===id);
+  if(ex){ex.quantity++}else{cart.push({id,title,price,image_url,quantity:1})}
+  localStorage.setItem('novastore_cart',JSON.stringify(cart));
+  updateBadge();
+  toast('Added to cart — '+title);
+}
+
+function toggleUserDropdown(e){
+  e.stopPropagation();
+  const d = document.getElementById('userDropdown');
+  if(d) d.style.display = (d.style.display === 'block') ? 'none' : 'block';
+}
+
+document.addEventListener('click', function(e){
+  const d = document.getElementById('userDropdown');
+  if(d && !e.target.closest('#userMenuBtn') && !e.target.closest('#userDropdown')){
+    d.style.display = 'none';
+  }
+});
+
+function getCookie(name){
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+function handleLogout(){
+  fetch('/api/auth/logout/', {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': getCookie('csrftoken') || ''
+    }
+  })
+  .then(() => {
+    window.location.href = '/';
+  })
+  .catch(err => {
+    window.location.href = '/account/login/';
+  });
+}
+</script>
+</body>
+</html>

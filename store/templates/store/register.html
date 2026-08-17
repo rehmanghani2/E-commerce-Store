@@ -1,0 +1,210 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Account — ToolNest Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#006194;--primary-dark:#004b73;--primary-light:#cce5ff;
+  --surface:#f7f9fb;--white:#ffffff;--surface-alt:#F1F5F9;
+  --on-surface:#191c1e;--on-surface-muted:#3f4850;
+  --border:#E2E8F0;--border-focus:#006194;
+  --error:#ba1a1a;--error-bg:#ffdad6;
+  --success:#15803d;--success-bg:#dcfce7;
+  --font-sans:'Inter',sans-serif;--font-mono:'JetBrains Mono',monospace;
+}
+body{font-family:var(--font-sans);background:var(--surface);color:var(--on-surface);min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+button{font-family:var(--font-sans);cursor:pointer;border:none;background:none}
+
+.nav{position:sticky;top:0;z-index:100;background:rgba(247,249,251,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 48px;height:60px;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{font-size:1.25rem;font-weight:700;color:var(--primary)}
+.nav-link{font-size:.875rem;color:var(--on-surface-muted);font-weight:500}
+.nav-link span{color:var(--primary);font-weight:600}
+
+main{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 24px}
+.auth-card{background:var(--white);border:1px solid var(--border);border-radius:.5rem;padding:40px;width:100%;max-width:480px;box-shadow:0 4px 20px rgba(15,23,42,.06)}
+.auth-header{margin-bottom:28px}
+.auth-title{font-size:1.5rem;font-weight:700;letter-spacing:-.02em;margin-bottom:6px}
+.auth-sub{font-size:.9rem;color:var(--on-surface-muted)}
+
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:.85rem;font-weight:500;color:var(--on-surface);margin-bottom:6px}
+.form-control{width:100%;background:var(--white);border:1px solid var(--border);border-radius:.25rem;padding:10px 12px;font-size:.9rem;font-family:var(--font-sans);color:var(--on-surface);outline:none;transition:border-color .15s,box-shadow .15s}
+.form-control:focus{border-color:var(--border-focus);box-shadow:0 0 0 2px rgba(0,97,148,.15)}
+
+.strength-bar{height:4px;border-radius:2px;margin-top:6px;background:var(--border);overflow:hidden;transition:all .3s}
+.strength-fill{height:100%;border-radius:2px;transition:width .3s,background .3s}
+
+.btn-primary{width:100%;padding:12px;background:var(--primary);color:#fff;font-size:.95rem;font-weight:600;border-radius:.25rem;transition:background .2s;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed}
+
+.alert{border-radius:.25rem;padding:10px 14px;font-size:.85rem;margin-bottom:16px;display:none;align-items:center;gap:8px}
+.alert.show{display:flex}
+.alert-error{background:var(--error-bg);border:1px solid rgba(186,26,26,.2);color:var(--error)}
+.alert-success{background:var(--success-bg);border:1px solid rgba(21,128,61,.2);color:var(--success)}
+
+.terms-note{font-size:.78rem;color:var(--on-surface-muted);text-align:center;margin-top:14px;line-height:1.5}
+.terms-note a{color:var(--primary)}
+.auth-footer{text-align:center;font-size:.875rem;color:var(--on-surface-muted);margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.auth-footer a{color:var(--primary);font-weight:600}
+
+.input-wrapper{position:relative}
+.input-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--on-surface-muted);font-size:.75rem;font-family:var(--font-mono);cursor:pointer;user-select:none}
+.input-toggle:hover{color:var(--primary)}
+
+.footer{border-top:1px solid var(--border);padding:24px 48px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.footer-brand{font-size:1rem;font-weight:700;color:var(--primary)}
+.footer-copy{font-size:.8rem;color:var(--on-surface-muted)}
+.footer-links{display:flex;gap:20px}
+.footer-link{font-size:.8rem;color:var(--on-surface-muted);text-decoration:underline;text-underline-offset:2px}
+
+@media(max-width:600px){
+  .nav,.footer{padding-left:16px;padding-right:16px}
+  .auth-card{padding:28px 20px}
+  .form-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-brand">ToolNest Store</a>
+  <a href="/account/login/" class="nav-link">Already have an account? <span>Sign in</span></a>
+</nav>
+
+<main>
+  <div class="auth-card">
+    <div class="auth-header">
+      <h1 class="auth-title">Create your account</h1>
+      <p class="auth-sub">Join ToolNest Store and get access to exclusive deals and order tracking.</p>
+    </div>
+
+    <div class="alert alert-error" id="errorAlert">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span id="errorMsg"></span>
+    </div>
+
+    <form id="registerForm" onsubmit="handleRegister(event)" novalidate>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="first_name">First Name</label>
+          <input class="form-control" type="text" id="first_name" placeholder="Jane" autocomplete="given-name">
+        </div>
+        <div class="form-group">
+          <label for="last_name">Last Name</label>
+          <input class="form-control" type="text" id="last_name" placeholder="Doe" autocomplete="family-name">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="username">Username <span style="color:var(--error)">*</span></label>
+        <input class="form-control" type="text" id="username" placeholder="jane_doe_92" autocomplete="username" required>
+      </div>
+      <div class="form-group">
+        <label for="email">Email Address <span style="color:var(--error)">*</span></label>
+        <input class="form-control" type="email" id="email" placeholder="jane@example.com" autocomplete="email" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password <span style="color:var(--error)">*</span></label>
+        <div class="input-wrapper">
+          <input class="form-control" type="password" id="password" placeholder="Min. 8 characters" autocomplete="new-password" required style="padding-right:56px" oninput="checkStrength(this.value)">
+          <span class="input-toggle" onclick="togglePwd()" id="pwdToggle">SHOW</span>
+        </div>
+        <div class="strength-bar"><div class="strength-fill" id="strengthFill" style="width:0%"></div></div>
+      </div>
+
+      <button type="submit" class="btn-primary" id="submitBtn">Create Account</button>
+    </form>
+
+    <div class="terms-note">
+      By creating an account you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+    </div>
+    <div class="auth-footer">
+      Already have an account? <a href="/account/login/">Sign in instead</a>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div style="display:flex;align-items:center;gap:12px">
+    <span class="footer-brand">ToolNest Store</span>
+    <span class="footer-copy">© 2026 ToolNest Store Engineering</span>
+  </div>
+  <div class="footer-links">
+    <a href="#" class="footer-link">Privacy Policy</a>
+    <a href="#" class="footer-link">Terms of Service</a>
+  </div>
+</footer>
+
+<script>
+function getCookie(n){let v=null;document.cookie.split(';').forEach(c=>{c=c.trim();if(c.startsWith(n+'='))v=decodeURIComponent(c.slice(n.length+1))});return v}
+
+function togglePwd(){
+  const inp=document.getElementById('password');
+  const tog=document.getElementById('pwdToggle');
+  inp.type=inp.type==='password'?'text':'password';
+  tog.textContent=inp.type==='password'?'SHOW':'HIDE';
+}
+
+function checkStrength(val){
+  const fill=document.getElementById('strengthFill');
+  let score=0;
+  if(val.length>=8)score++;
+  if(/[A-Z]/.test(val))score++;
+  if(/[0-9]/.test(val))score++;
+  if(/[^A-Za-z0-9]/.test(val))score++;
+  const pct=[0,25,50,75,100][score];
+  const colors=['#ba1a1a','#f59e0b','#f59e0b','#15803d','#15803d'];
+  fill.style.width=pct+'%';
+  fill.style.background=colors[score]||'#ba1a1a';
+}
+
+function showError(msg){
+  document.getElementById('errorMsg').textContent=msg;
+  document.getElementById('errorAlert').classList.add('show');
+}
+
+async function handleRegister(e){
+  e.preventDefault();
+  const btn=document.getElementById('submitBtn');
+  document.getElementById('errorAlert').classList.remove('show');
+  const username=document.getElementById('username').value.trim();
+  const email=document.getElementById('email').value.trim();
+  const password=document.getElementById('password').value;
+  const first_name=document.getElementById('first_name').value.trim();
+  const last_name=document.getElementById('last_name').value.trim();
+
+  if(!username){showError('Username is required.');return}
+  if(!email){showError('Email address is required.');return}
+  if(password.length<8){showError('Password must be at least 8 characters.');return}
+
+  btn.disabled=true;btn.textContent='Creating account…';
+
+  try{
+    const res=await fetch('/api/auth/register/',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')},
+      body:JSON.stringify({username,email,password,first_name,last_name})
+    });
+    const data=await res.json();
+    if(data.success){
+      window.location.href='/';
+    }else{
+      showError(data.error||'Registration failed. Please try again.');
+      btn.disabled=false;btn.textContent='Create Account';
+    }
+  }catch(err){
+    showError('Network error. Please try again.');
+    btn.disabled=false;btn.textContent='Create Account';
+  }
+}
+</script>
+</body>
+</html>

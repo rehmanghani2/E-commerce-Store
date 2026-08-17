@@ -1,0 +1,376 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — ToolNest Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#006194;--primary-dark:#004b73;--primary-light:#cce5ff;
+  --surface:#f7f9fb;--white:#ffffff;--surface-alt:#F1F5F9;
+  --on-surface:#191c1e;--on-surface-muted:#3f4850;
+  --border:#E2E8F0;--border-focus:#006194;
+  --error:#ba1a1a;--success:#15803d;
+  --font-sans:'Inter',sans-serif;--font-mono:'JetBrains Mono',monospace;
+  --shadow:0 4px 20px rgba(15,23,42,.06);--max-w:1280px;
+}
+body{font-family:var(--font-sans);background:var(--surface);color:var(--on-surface);font-size:16px;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button{font-family:var(--font-sans);cursor:pointer;border:none;background:none}
+img{display:block;max-width:100%}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:rgba(247,249,251,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 48px;height:60px;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{font-size:1.25rem;font-weight:700;color:var(--primary)}
+.secure-label{display:flex;align-items:center;gap:6px;font-size:.85rem;color:var(--on-surface-muted);font-weight:500}
+.secure-label svg{width:16px;height:16px;stroke:var(--success);fill:none;stroke-width:2}
+
+/* PAGE */
+.page{max-width:var(--max-w);margin:0 auto;padding:32px 48px 80px}
+.checkout-layout{display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start}
+
+/* STEPPER */
+.stepper{background:var(--white);border:1px solid var(--border);border-radius:.5rem;padding:20px 28px;margin-bottom:16px;display:flex;align-items:center;gap:0}
+.step{display:flex;align-items:center;gap:10px;flex:1}
+.step-num{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:.8rem;font-weight:500;color:var(--on-surface-muted);flex-shrink:0}
+.step.active .step-num{border-color:var(--primary);background:var(--primary-light);color:var(--primary)}
+.step.done .step-num{border-color:var(--success);background:#dcfce7;color:var(--success)}
+.step-label{font-family:var(--font-mono);font-size:.7rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--on-surface-muted)}
+.step.active .step-label{color:var(--primary)}
+.step-line{flex:1;height:1px;background:var(--border);margin:0 8px}
+
+/* ACCORDION SECTIONS */
+.section-card{background:var(--white);border:1px solid var(--border);border-radius:.5rem;margin-bottom:12px;overflow:hidden}
+.section-header{padding:18px 24px;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none}
+.section-header svg{width:18px;height:18px;stroke:var(--on-surface-muted);fill:none;stroke-width:1.75;flex-shrink:0}
+.section-header h2{font-size:1rem;font-weight:600;color:var(--on-surface)}
+.section-header.collapsed h2{color:var(--on-surface-muted)}
+.section-body{padding:0 24px 24px;display:block}
+.section-body.hidden{display:none}
+
+/* FORM */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group label{font-size:.85rem;font-weight:500;color:var(--on-surface)}
+.form-control{background:var(--white);border:1px solid var(--border);border-radius:.25rem;padding:10px 12px;font-size:.9rem;font-family:var(--font-sans);color:var(--on-surface);outline:none;transition:border-color .15s,box-shadow .15s}
+.form-control:focus{border-color:var(--border-focus);box-shadow:0 0 0 2px rgba(0,97,148,.15)}
+select.form-control{cursor:pointer}
+.btn-continue{background:var(--primary);color:#fff;font-size:.9rem;font-weight:600;border-radius:.25rem;padding:11px 24px;display:flex;align-items:center;gap:8px;transition:background .2s;margin-top:8px;float:right}
+.btn-continue:hover{background:var(--primary-dark)}
+.btn-continue svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* PAYMENT OPTIONS */
+.pay-options{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.pay-option{border:1.5px solid var(--border);border-radius:.375rem;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .15s}
+.pay-option.selected{border-color:var(--primary);background:var(--primary-light)}
+.pay-option input[type=radio]{accent-color:var(--primary)}
+.pay-option label{font-size:.9rem;font-weight:500;cursor:pointer}
+.card-fields{display:grid;gap:12px;margin-top:8px}
+
+/* ORDER SUMMARY PANEL */
+.summary-box{background:var(--white);border:1px solid var(--border);border-radius:.5rem;padding:24px;position:sticky;top:76px}
+.summary-title{font-size:1.1rem;font-weight:700;margin-bottom:16px}
+.summary-items{display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
+.summary-item{display:flex;gap:12px;align-items:center}
+.summary-item-img{width:48px;height:48px;border-radius:.25rem;object-fit:cover;background:var(--surface-alt);border:1px solid var(--border);flex-shrink:0}
+.summary-item-info{flex:1}
+.summary-item-name{font-size:.85rem;font-weight:600;color:var(--on-surface);margin-bottom:2px}
+.summary-item-meta{font-size:.75rem;color:var(--on-surface-muted)}
+.summary-item-price{font-family:var(--font-mono);font-size:.85rem;font-weight:500;color:var(--primary)}
+.summary-divider{border:none;border-top:1px solid var(--border);margin:14px 0}
+.summary-row{display:flex;justify-content:space-between;font-size:.875rem;margin-bottom:8px}
+.summary-row .label{color:var(--on-surface-muted)}
+.summary-total{display:flex;justify-content:space-between;align-items:baseline;margin:14px 0}
+.summary-total .tl{font-size:1rem;font-weight:700}
+.summary-total .tv{font-family:var(--font-mono);font-size:1.35rem;font-weight:500;color:var(--on-surface)}
+.summary-note{background:var(--surface-alt);border:1px solid var(--border);border-radius:.375rem;padding:12px;font-size:.78rem;color:var(--on-surface-muted);line-height:1.5;display:flex;gap:8px;align-items:flex-start}
+.summary-note svg{width:14px;height:14px;stroke:var(--on-surface-muted);fill:none;stroke-width:1.75;flex-shrink:0;margin-top:2px}
+
+/* SUCCESS MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(6px);z-index:500;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.open{opacity:1;pointer-events:auto}
+.modal-box{background:#fff;border:1px solid var(--border);border-radius:.75rem;padding:40px 36px;max-width:440px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.modal-icon{font-size:3rem;margin-bottom:16px}
+.modal-title{font-size:1.4rem;font-weight:700;margin-bottom:8px}
+.modal-sub{color:var(--on-surface-muted);font-size:.9rem;margin-bottom:24px;line-height:1.6}
+.modal-detail{background:var(--surface-alt);border:1px solid var(--border);border-radius:.375rem;padding:14px 16px;margin-bottom:24px;text-align:left;display:flex;flex-direction:column;gap:8px}
+.modal-detail-row{display:flex;justify-content:space-between;font-size:.85rem}
+.modal-detail-row .dk{color:var(--on-surface-muted)}
+.modal-detail-row .dv{font-family:var(--font-mono);font-weight:500;color:var(--primary)}
+.modal-actions{display:flex;gap:10px}
+.btn-primary{flex:1;padding:12px;background:var(--primary);color:#fff;font-size:.9rem;font-weight:600;border-radius:.25rem;text-align:center;transition:background .2s}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-ghost{flex:1;padding:12px;border:1.5px solid var(--primary);color:var(--primary);font-size:.9rem;font-weight:600;border-radius:.25rem;text-align:center;transition:all .2s}
+.btn-ghost:hover{background:var(--primary-light)}
+
+/* FOOTER */
+.footer{border-top:1px solid var(--border);background:#fff;padding:40px 48px}
+.footer-inner{max-width:var(--max-w);margin:0 auto;display:flex;justify-content:space-between;align-items:start;gap:32px;flex-wrap:wrap}
+.footer-brand{font-size:1.1rem;font-weight:700;color:var(--primary);margin-bottom:6px}
+.footer-copy{font-size:.8rem;color:var(--on-surface-muted)}
+.footer-links{display:flex;gap:24px;flex-wrap:wrap}
+.footer-link{font-size:.85rem;color:var(--on-surface-muted);text-decoration:underline;text-underline-offset:2px}
+.footer-link:hover{color:var(--primary)}
+
+@media(max-width:860px){
+  .nav,.page,.footer{padding-left:16px;padding-right:16px}
+  .checkout-layout{grid-template-columns:1fr}
+  .summary-box{position:static}
+  .form-row,.form-row-3{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-brand">ToolNest Store</a>
+  <div class="secure-label">
+    <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+    Secure Checkout
+  </div>
+</nav>
+
+<div class="page">
+  <div class="checkout-layout">
+
+    <!-- LEFT COLUMN -->
+    <div>
+      <!-- STEPPER -->
+      <div class="stepper">
+        <div class="step active" id="step1">
+          <div class="step-num">1</div>
+          <div class="step-label">Shipping</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step" id="step2">
+          <div class="step-num">2</div>
+          <div class="step-label">Payment</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step" id="step3">
+          <div class="step-num">3</div>
+          <div class="step-label">Review</div>
+        </div>
+      </div>
+
+      <!-- SHIPPING SECTION -->
+      <div class="section-card" id="shippingCard">
+        <div class="section-header" id="shippingHeader">
+          <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          <h2>Shipping Information</h2>
+        </div>
+        <div class="section-body" id="shippingBody">
+          <div class="form-row">
+            <div class="form-group"><label>First Name</label><input class="form-control" id="firstName" placeholder="Jane" type="text"></div>
+            <div class="form-group"><label>Last Name</label><input class="form-control" id="lastName" placeholder="Doe" type="text"></div>
+          </div>
+          <div class="form-group" style="margin-bottom:16px"><label>Street Address</label><input class="form-control" id="address" placeholder="123 Tech Lane, Suite 400" type="text"></div>
+          <div class="form-row-3">
+            <div class="form-group"><label>City</label><input class="form-control" id="city" placeholder="San Francisco" type="text"></div>
+            <div class="form-group"><label>State/Province</label>
+              <select class="form-control" id="state">
+                <option>California</option><option>New York</option><option>Texas</option><option>Florida</option><option>Other</option>
+              </select>
+            </div>
+            <div class="form-group"><label>ZIP / Postal Code</label><input class="form-control" id="zip" placeholder="94105" type="text"></div>
+          </div>
+          <div class="form-group" style="margin-bottom:20px"><label>Phone Number</label><input class="form-control" id="phone" placeholder="+1 (555) 000-0000" type="tel"></div>
+          <div style="overflow:hidden">
+            <button class="btn-continue" onclick="goToPayment()">
+              Continue to Payment
+              <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAYMENT SECTION -->
+      <div class="section-card" id="paymentCard">
+        <div class="section-header collapsed" id="paymentHeader" onclick="if(currentStep>=2)goToStep(2)">
+          <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          <h2>Payment Method</h2>
+        </div>
+        <div class="section-body hidden" id="paymentBody">
+          <div class="pay-options">
+            <div class="pay-option selected" onclick="selectPay(this,'Credit Card')">
+              <input type="radio" name="pay" id="payCard" checked>
+              <label for="payCard">Credit / Debit Card</label>
+            </div>
+            <div class="pay-option" onclick="selectPay(this,'PayPal')">
+              <input type="radio" name="pay" id="payPal">
+              <label for="payPal">PayPal</label>
+            </div>
+          </div>
+          <div class="card-fields" id="cardFields">
+            <div class="form-group"><label>Card Number</label><input class="form-control" id="cardNum" placeholder="•••• •••• •••• ••••" maxlength="19"></div>
+            <div class="form-row">
+              <div class="form-group"><label>Expiry</label><input class="form-control" id="cardExp" placeholder="MM / YY" maxlength="7"></div>
+              <div class="form-group"><label>CVV</label><input class="form-control" id="cardCvv" placeholder="•••" maxlength="4"></div>
+            </div>
+          </div>
+          <div style="overflow:hidden;margin-top:8px">
+            <button class="btn-continue" onclick="goToReview()">
+              Continue to Review
+              <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- REVIEW SECTION -->
+      <div class="section-card" id="reviewCard">
+        <div class="section-header collapsed" id="reviewHeader" onclick="if(currentStep>=3)goToStep(3)">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <h2>Order Review</h2>
+        </div>
+        <div class="section-body hidden" id="reviewBody">
+          <div id="reviewItems" style="margin-bottom:20px"></div>
+          <button class="btn-continue" onclick="submitOrder()" style="background:#15803d">
+            Place Order →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: ORDER SUMMARY -->
+    <div class="summary-box">
+      <div class="summary-title">Order Summary</div>
+      <div class="summary-items" id="summaryItems"></div>
+      <div class="summary-divider"></div>
+      <div class="summary-row"><span class="label">Subtotal</span><span id="sumSubtotal">$0.00</span></div>
+      <div class="summary-row"><span class="label">Shipping</span><span style="color:var(--on-surface-muted);font-size:.8rem">Calculated next step</span></div>
+      <div class="summary-row"><span class="label">Estimated Tax</span><span id="sumTax">$0.00</span></div>
+      <div class="summary-total"><span class="tl">Total</span><span class="tv" id="sumTotal">$0.00</span></div>
+      <div class="summary-note">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Taxes and shipping calculated at checkout. By continuing, you agree to our Terms of Service.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal-box">
+    <div class="modal-icon">🎉</div>
+    <h2 class="modal-title">Order Confirmed!</h2>
+    <p class="modal-sub">Thank you for your purchase. We're preparing your order and you'll receive a confirmation shortly.</p>
+    <div class="modal-detail">
+      <div class="modal-detail-row"><span class="dk">Order Reference</span><span class="dv" id="modalOrderNum">—</span></div>
+      <div class="modal-detail-row"><span class="dk">Total Charged</span><span class="dv" id="modalTotal">—</span></div>
+    </div>
+    <div class="modal-actions">
+      <a href="/" class="btn-primary">Continue Shopping</a>
+      <a href="/orders/" class="btn-ghost">My Orders</a>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">ToolNest Store</div>
+      <div class="footer-copy">© 2026 ToolNest Store Engineering. All rights reserved.</div>
+    </div>
+    <div class="footer-links">
+      <a href="#" class="footer-link">About Us</a>
+      <a href="#" class="footer-link">Support</a>
+      <a href="#" class="footer-link">Terms of Service</a>
+      <a href="#" class="footer-link">Privacy Policy</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+function getCookie(n){let v=null;document.cookie.split(';').forEach(c=>{c=c.trim();if(c.startsWith(n+'='))v=decodeURIComponent(c.slice(n.length+1))});return v}
+
+let cart=[];
+try{cart=JSON.parse(localStorage.getItem('novastore_cart')||'[]')}catch(e){}
+let currentStep=1;
+let selectedPayment='Credit Card';
+
+function renderSummary(){
+  const subtotal=cart.reduce((s,i)=>s+(i.price*i.quantity),0);
+  const tax=subtotal*0.07;
+  document.getElementById('sumSubtotal').textContent='$'+subtotal.toFixed(2);
+  document.getElementById('sumTax').textContent='$'+tax.toFixed(2);
+  document.getElementById('sumTotal').textContent='$'+(subtotal+tax).toFixed(2);
+  document.getElementById('summaryItems').innerHTML=cart.map(i=>`
+    <div class="summary-item">
+      <img class="summary-item-img" src="${i.image_url}" alt="${i.title}">
+      <div class="summary-item-info">
+        <div class="summary-item-name">${i.title}</div>
+        <div class="summary-item-meta">Qty: ${i.quantity}</div>
+      </div>
+      <div class="summary-item-price">$${(i.price*i.quantity).toFixed(2)}</div>
+    </div>
+  `).join('');
+}
+
+function goToPayment(){
+  if(!document.getElementById('firstName').value.trim()){alert('Please enter your first name');return}
+  if(!document.getElementById('address').value.trim()){alert('Please enter your address');return}
+  goToStep(2);
+}
+function goToReview(){
+  goToStep(3);
+  document.getElementById('reviewItems').innerHTML=cart.map(i=>`
+    <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:.9rem">
+      <span>${i.title} × ${i.quantity}</span>
+      <span style="font-family:var(--font-mono);font-weight:500">$${(i.price*i.quantity).toFixed(2)}</span>
+    </div>
+  `).join('');
+}
+
+function goToStep(n){
+  currentStep=n;
+  ['shipping','payment','review'].forEach((id,idx)=>{
+    const body=document.getElementById(id+'Body');
+    const header=document.getElementById(id+'Header');
+    const stepEl=document.getElementById('step'+(idx+1));
+    if(idx+1===n){body.classList.remove('hidden');header.classList.remove('collapsed');stepEl.classList.add('active')}
+    else if(idx+1<n){body.classList.add('hidden');header.classList.add('collapsed');stepEl.classList.remove('active');stepEl.classList.add('done')}
+    else{body.classList.add('hidden');header.classList.add('collapsed');stepEl.classList.remove('active','done')}
+  });
+}
+
+function selectPay(el,method){
+  selectedPayment=method;
+  document.querySelectorAll('.pay-option').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  el.querySelector('input[type=radio]').checked=true;
+}
+
+async function submitOrder(){
+  if(cart.length===0){alert('Cart is empty');return}
+  const payload={
+    full_name:(document.getElementById('firstName').value+' '+document.getElementById('lastName').value).trim(),
+    email:'guest@novastore.com',
+    phone:document.getElementById('phone').value,
+    address:document.getElementById('address').value,
+    city:document.getElementById('city').value,
+    zip_code:document.getElementById('zip').value,
+    payment_method:selectedPayment,
+    items:cart
+  };
+  try{
+    const res=await fetch('/api/order/place/',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')},body:JSON.stringify(payload)});
+    const data=await res.json();
+    if(data.success){
+      localStorage.removeItem('novastore_cart');
+      document.getElementById('modalOrderNum').textContent=data.order_number;
+      document.getElementById('modalTotal').textContent='$'+data.total_amount.toFixed(2);
+      document.getElementById('successModal').classList.add('open');
+    }else{alert(data.error||'Failed to place order')}
+  }catch(e){alert('Error placing order. Please try again.')}
+}
+
+renderSummary();
+</script>
+</body>
+</html>
