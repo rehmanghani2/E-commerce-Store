@@ -24,6 +24,7 @@ urlpatterns = [
     path('api/products/<int:pk>/', views.api_product_detail, name='api_product_detail'),
     path('api/admin/products/add/', views.api_admin_product_add, name='api_admin_product_add'),
     path('api/admin/products/<int:pk>/delete/', views.api_admin_product_delete, name='api_admin_product_delete'),
+    path('api/admin/upload-image/', views.api_admin_upload_image, name='api_admin_upload_image'),
     path('api/order/place/', views.api_place_order, name='api_place_order'),
     path('api/auth/register/', views.api_register, name='api_register'),
     path('api/auth/login/', views.api_login, name='api_login'),

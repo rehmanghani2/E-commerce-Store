@@ -434,6 +434,42 @@ def api_admin_product_delete(request, pk):
         return JsonResponse({'error': str(e)}, status=400)
 
 
+def api_admin_upload_image(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST method required'}, status=405)
+    try:
+        image_file = request.FILES.get('image_file')
+        if not image_file:
+            return JsonResponse({'error': 'No image file provided'}, status=400)
+
+        cloudinary_url = os.environ.get('CLOUDINARY_URL', '')
+        cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME', '')
+
+        if cloudinary_url or cloud_name:
+            import cloudinary
+            import cloudinary.uploader
+            if cloudinary_url:
+                cloudinary.config(cloudinary_url=cloudinary_url)
+            else:
+                cloudinary.config(
+                    cloud_name=cloud_name,
+                    api_key=os.environ.get('CLOUDINARY_API_KEY', ''),
+                    api_secret=os.environ.get('CLOUDINARY_API_SECRET', ''),
+                    secure=True
+                )
+            upload_result = cloudinary.uploader.upload(image_file, folder="toolnest_products")
+            url = upload_result.get('secure_url') or upload_result.get('url')
+            return JsonResponse({'success': True, 'url': url})
+        else:
+            import base64
+            encoded = base64.b64encode(image_file.read()).decode('utf-8')
+            mime_type = image_file.content_type or 'image/jpeg'
+            data_url = f"data:{mime_type};base64,{encoded}"
+            return JsonResponse({'success': True, 'url': data_url})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+
 def api_user_status(request):
     if request.user.is_authenticated:
         return JsonResponse({'is_authenticated': True, **_user_to_dict(request.user)})

@@ -219,17 +219,24 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none}
         <!-- RIGHT COLUMN -->
         <div>
           <div class="card">
-            <div class="card-title">Media</div>
-            <div class="dropzone" onclick="document.getElementById('imageUrl').focus()">
+            <div class="card-title">Media & Imagery</div>
+            <div class="dropzone" id="dropzoneBox" onclick="document.getElementById('imageFileInput').click()">
               <div class="dropzone-icon">
                 <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
               </div>
-              <div class="dropzone-text">Click to upload or drag and drop</div>
-              <div class="dropzone-sub">SVG, PNG, JPG (max 5MB)</div>
+              <div class="dropzone-text" id="dropzoneStatus">Click to upload image file</div>
+              <div class="dropzone-sub">Auto-uploads to Cloudinary CDN</div>
             </div>
+            <input type="file" id="imageFileInput" style="display:none" accept="image/*" onchange="handleFileUpload(this)">
+
             <div class="form-group" style="margin-top:16px">
-              <label class="form-label">OR IMAGE URL</label>
-              <input class="form-control" type="url" id="imageUrl" placeholder="https://images.unsplash.com/...">
+              <label class="form-label">OR PASTE IMAGE URL</label>
+              <input class="form-control" type="url" id="imageUrl" placeholder="https://res.cloudinary.com/..." oninput="updateImagePreview(this.value)">
+            </div>
+
+            <div id="imagePreviewWrapper" style="display:none;margin-top:16px;text-align:center;background:var(--surface);padding:12px;border-radius:.375rem;border:1px solid var(--border)">
+              <label class="form-label" style="text-align:left;display:block;margin-bottom:8px">LIVE IMAGE PREVIEW</label>
+              <img id="imagePreview" src="" alt="Preview" style="max-width:100%;max-height:160px;border-radius:.25rem;object-fit:cover">
             </div>
           </div>
 
@@ -262,6 +269,47 @@ button{font-family:var(--font-sans);cursor:pointer;border:none;background:none}
 
 <script>
 function getCookie(n){let v=null;document.cookie.split(';').forEach(c=>{c=c.trim();if(c.startsWith(n+'='))v=decodeURIComponent(c.slice(n.length+1))});return v}
+
+function updateImagePreview(url){
+  const wrapper=document.getElementById('imagePreviewWrapper');
+  const img=document.getElementById('imagePreview');
+  if(url && url.trim().length > 5){
+    img.src=url.trim();
+    wrapper.style.display='block';
+  }else{
+    wrapper.style.display='none';
+  }
+}
+
+async function handleFileUpload(input){
+  if(!input.files || !input.files[0]) return;
+  const file = input.files[0];
+  const status = document.getElementById('dropzoneStatus');
+  status.textContent = 'Uploading to Cloudinary...';
+
+  const formData = new FormData();
+  formData.append('image_file', file);
+
+  try {
+    const res = await fetch('/api/admin/upload-image/', {
+      method: 'POST',
+      headers: { 'X-CSRFToken': getCookie('csrftoken') },
+      body: formData
+    });
+    const data = await res.json();
+    if(data.success && data.url){
+      document.getElementById('imageUrl').value = data.url;
+      updateImagePreview(data.url);
+      status.textContent = '✅ Image uploaded successfully!';
+    } else {
+      alert('Failed to upload image: ' + (data.error || 'Unknown error'));
+      status.textContent = 'Click to upload image file';
+    }
+  } catch(err) {
+    alert('Error uploading file to Cloudinary.');
+    status.textContent = 'Click to upload image file';
+  }
+}
 
 async function saveProduct(e){
   e.preventDefault();
