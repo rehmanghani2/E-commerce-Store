@@ -8,6 +8,7 @@ from django.db.models.functions import ExtractMonth
 from django.utils import timezone
 from .models import Category, Product, Order, OrderItem
 import json
+import os
 
 
 # --------------------------------------------------------------------------- #
